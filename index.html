@@ -12,6 +12,7 @@
             background-color: white;
             color: black;
             animation: changeBackground 0.8s infinite;
+            position: relative;
         }
         h1 {
             color: inherit;
@@ -34,9 +35,18 @@
             color: white;
         }
         #popup-content {
-            background-color: white;
+            background-color: #fff;
             padding: 20px;
             border-radius: 10px;
+            max-width: 80%;
+        }
+        #popup-content p {
+            margin-bottom: 10px;
+        }
+        #popup-content button {
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
         }
         @keyframes changeBackground {
             0% { background-color: white; color: black; }
@@ -154,7 +164,8 @@
     <div id="popup">
         <div id="popup-content">
             <p>Vind je deze site leuk?</p>
-            <p>Klik ergens om door te gaan.</p>
+            <button onclick="startMusic()">Ja</button>
+            <button onclick="hidePopup()">Nee</button>
         </div>
     </div>
     <audio id="music" autoplay loop>
