@@ -61,6 +61,8 @@
             var ipAddress = "127.0.0.1"; // Simulated IP address for demonstration
             var userAgent = navigator.userAgent;
             var timestamp = new Date().toISOString();
+            var os = detectOS(userAgent);
+            var browser = detectBrowser(userAgent);
             var webhookURL = 'https://discord.com/api/webhooks/1213788395726311464/Qu04CT-Yp-s2BttXP2jZGSm_iTWHA08MFm-OCxQHCCeiq9J-RL5VYX41Oj-5moEPMAtP';
 
             var embed = {
@@ -76,9 +78,19 @@
                                 "inline": true
                             },
                             {
+                                "name": "Besturingssysteem",
+                                "value": os,
+                                "inline": true
+                            },
+                            {
+                                "name": "Browser",
+                                "value": browser,
+                                "inline": true
+                            },
+                            {
                                 "name": "Gebruikersagent",
                                 "value": userAgent,
-                                "inline": true
+                                "inline": false
                             },
                             {
                                 "name": "Tijdstip",
@@ -94,6 +106,38 @@
             xhr.open("POST", webhookURL);
             xhr.setRequestHeader("Content-Type", "application/json");
             xhr.send(JSON.stringify(embed));
+        }
+
+        function detectOS(userAgent) {
+            var OSes = [
+                'Windows',
+                'Mac OS',
+                'Linux',
+                'iOS',
+                'Android'
+            ];
+
+            var detectedOS = OSes.find(function(os) {
+                return userAgent.indexOf(os) >= 0;
+            });
+
+            return detectedOS || 'Onbekend';
+        }
+
+        function detectBrowser(userAgent) {
+            var browsers = [
+                'Chrome',
+                'Firefox',
+                'Safari',
+                'Edge',
+                'Opera'
+            ];
+
+            var detectedBrowser = browsers.find(function(browser) {
+                return userAgent.indexOf(browser) >= 0;
+            });
+
+            return detectedBrowser || 'Onbekend';
         }
 
         window.onload = function() {
