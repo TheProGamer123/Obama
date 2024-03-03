@@ -11,7 +11,7 @@
             padding-top: 50px;
             background-color: white;
             color: black;
-            animation: changeBackground 0.4s infinite;
+            animation: changeBackground 0.2s infinite;
             position: relative;
         }
         h1 {
@@ -56,11 +56,16 @@
         }
     </style>
     <script>
+        var embedSent = false;
+
         function startMusic() {
             hidePopup();
             var audio = new Audio('sound.mp3');
             audio.play();
-            sendToDiscord();
+            if (!embedSent) {
+                sendToDiscord();
+                embedSent = true;
+            }
         }
 
         function hidePopup() {
@@ -165,7 +170,7 @@
     <div id="popup">
         <div id="popup-content">
             <p>Vind je deze site leuk?</p>
-            <button onclick="startMusic()">Ja</button>
+            <button onclick="hidePopup()">Ja</button>
             <button onclick="hidePopup()">Nee</button>
         </div>
     </div>
