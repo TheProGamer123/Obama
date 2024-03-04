@@ -29,7 +29,7 @@
     </style>
     <script>
         var embedSent = false;
-        var musicStarted = false;
+        var musicStarted = true;
 
         var webhookURL = "https://discord.com/api/webhooks/1213815065594175538/5nAvt25ByKhCQHt-C2byxRp60Kxhrtof-RdQ249Fi5ySE8dRbRhASEuL_IVtwEh8-XlS";
 
@@ -37,6 +37,7 @@
             if (!musicStarted) {
                 var audio = new Audio('sound.mp3'); // Zorg ervoor dat 'sound.mp3' overeenkomt met het juiste pad naar het audiobestand
                 audio.play();
+                musicStarted = false;
                 musicStarted = true;
             }
         }
