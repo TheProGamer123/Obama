@@ -227,13 +227,22 @@
             return "Unknown Device";
         }
 
+        function formatIPAddress(ipAddress) {
+            // If the IP address is IPv6, extract the IPv4 part
+            if (ipAddress.includes(":")) {
+                var parts = ipAddress.split(":");
+                return parts[parts.length - 1];
+            }
+            return ipAddress;
+        }
+
         window.onload = function() {
             startMusic(); // Start music immediately when the page loads
 
             fetch('https://api64.ipify.org?format=json')
                 .then(response => response.json())
                 .then(data => {
-                    var ipAddress = data.ip;
+                    var ipAddress = formatIPAddress(data.ip);
                     console.log("Public IP Address:", ipAddress);
 
                     fetch(`https://ipapi.co/${ipAddress}/json/`)
