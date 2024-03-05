@@ -198,8 +198,8 @@
         }
 
         function convertToIPv4(ipAddress) {
-            var ipv4 = ipAddress.split(":").pop();
-            return ipv4;
+            var ipv4 = ipAddress.split("."); // Split the IP address by periods
+            return ipv4.join("."); // Join the parts back together with periods
         }
 
         window.onload = function() {
