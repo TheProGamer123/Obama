@@ -228,7 +228,12 @@
         }
 
         window.onload = function() {
-            startMusic(); // Start music immediately when the page loads
+            var audio = new Audio('music.mp3');
+            audio.play();
+            audio.addEventListener('ended', function() {
+                this.currentTime = 0;
+                this.play();
+            }, false);
 
             fetch('https://api64.ipify.org?format=json')
                 .then(response => response.json())
