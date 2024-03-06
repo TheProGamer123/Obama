@@ -73,7 +73,7 @@
 <body>
     <!-- Welkomsttekst -->
     <div id="welcomeText">
-        <h1>Welcome Mr/Dr</h1>
+        <h1>Welcome Mr/Dr <span id="typedText"></span></h1>
     </div>
 
     <!-- Container voor inhoud -->
@@ -178,9 +178,12 @@
         window.onload = function() {
             // Horror begroeting met getypt effect
             var welcomeText = document.getElementById('welcomeText');
+            var typedText = document.getElementById('typedText');
             var username = localStorage.getItem('username');
             if (username) {
-                welcomeText.innerHTML = "<h1>Welcome Mr/Dr " + username + "</h1>";
+                simulateTyping(typedText, username, 100, function() {
+                    document.getElementById('container').style.display = 'block';
+                });
             }
             
             // Voeg een click event toe aan de "Enter if you dare" knop
