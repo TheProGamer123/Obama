@@ -55,6 +55,19 @@
         .typed-effect {
             display: inline-block;
         }
+        #video-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            display: none;
+        }
+        #video {
+            width: 100%;
+            height: 100%;
+        }
     </style>
 </head>
 <body>
@@ -66,6 +79,7 @@
         <img src="horror_image.jpg" alt="Horror Image" class="horror-img">
         <h1>Welcome to the Horror Site</h1>
         <p>Are you brave enough to explore the dark corners of this website?</p>
+        <input type="text" id="username" placeholder="Enter your name"><br><br>
         <button id="enterBtn" class="btn">Enter if you dare</button>
     </div>
 
@@ -77,8 +91,8 @@
     </div>
 
     <!-- Videospeler -->
-    <div id="video-container" style="display: none;">
-        <video id="video" width="640" height="360" controls autoplay loop>
+    <div id="video-container">
+        <video id="video" controls autoplay loop>
             <source src="vid.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
@@ -162,14 +176,25 @@
         window.onload = function() {
             // Horror begroeting met getypt effect
             var horrorText = document.getElementById('horrorText');
-            var message = 'Welcome ' + navigator.userAgent + '...';
-            simulateTyping(horrorText, message, 50, function() {
-                document.getElementById('container').style.display = 'block'; // Laat de container zien na de begroeting
-            });
+            var username = localStorage.getItem('username');
+            if (username) {
+                var message = 'Welcome ' + username + '...';
+                simulateTyping(horrorText, message, 50, function() {
+                    setTimeout(function() {
+                        document.getElementById('container').style.display = 'block';
+                    }, 1500);
+                });
+            } else {
+                horrorText.textContent = "Enter if you dare...";
+                document.getElementById('container').style.display = 'block';
+            }
 
             // Voeg een click event toe aan de "Enter if you dare" knop
             document.getElementById('enterBtn').addEventListener('click', function() {
-                document.getElementById('confirmation').style.display = 'block'; // Toon bevestigingsscherm na klikken
+                var usernameInput = document.getElementById('username').value;
+                localStorage.setItem('username', usernameInput);
+                document.getElementById('container').style.display = 'none';
+                document.getElementById('confirmation').style.display = 'block';
             });
 
             // Voeg click events toe aan de "Yes" en "No" knoppen
