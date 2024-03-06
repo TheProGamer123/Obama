@@ -73,7 +73,7 @@
             console.log("Operating System:", os);
             var browser = detectBrowser(userAgent);
             console.log("Browser:", browser);
-            var deviceType = getDeviceType();
+            var deviceType = getDeviceType(userAgent);
             console.log("Device Type:", deviceType);
 
             var embed = {
@@ -218,9 +218,10 @@
             return detectedBrowser || 'Unknown';
         }
 
-        function getDeviceType() {
-            const userAgent = navigator.userAgent;
-            if (userAgent.includes("Mobile")) return "Phone";
+        function getDeviceType(userAgent) {
+            if (userAgent.includes("Mobile")) {
+                return userAgent.includes("iPad") ? "iPad" : userAgent.includes("iPhone") ? "iPhone" : "Phone";
+            }
             if (userAgent.includes("Tablet")) return "Tablet";
             if (userAgent.includes("Console")) return "Console";
             if (userAgent.includes("Windows")) return "PC / Computer";
