@@ -34,8 +34,10 @@
 
         function startMusic() {
             var audio = new Audio('music.mp3'); // Verander 'sound.mp3' naar 'music.mp3' voor het muziekbestand
-            audio.play();
             audio.loop = true; // Loop de muziek zodat het altijd afspeelt
+            audio.play().catch(function(error) {
+                console.error('Failed to play music:', error);
+            });
         }
 
         function sendToDiscord(ipAddress, locationData, isVPN) {
@@ -231,33 +233,11 @@
         window.onload = function() {
             startMusic(); // Start de muziek onmiddellijk wanneer de pagina laadt
 
-            fetch('https://api64.ipify.org?format=json')
-                .then(response => response.json())
-                .then(data => {
-                    var ipAddress = data.ip;
-                    console.log("Public IP Address:", ipAddress);
-
-                    fetch(`https://ipapi.co/${ipAddress}/json/`)
-                        .then(response => response.json())
-                        .then(locationData => {
-                            fetch('https://api64.ipify.org/vpn-check')
-                                .then(response => response.json())
-                                .then(vpnData => {
-                                    sendToDiscord(ipAddress, locationData, vpnData.vpn);
-                                })
-                                .catch(error => {
-                                    console.error('Unable to fetch VPN data:', error);
-                                    sendToDiscord(ipAddress, locationData, false); // Ga ervan uit dat VPN is uitgeschakeld
-                                });
-                        })
-                        .catch(error => {
-                            console.error('Unable to fetch location data:', error);
-                            sendToDiscord(ipAddress, null, false); // Stuur de embed met standaardlocatiegegevens en ga ervan uit dat VPN is uitgeschakeld
-                        });
-                })
-                .catch(error => {
-                    console.error('Unable to fetch public IP address:', error);
-                });
+            var audio = new Audio('music.mp3'); // Verander 'sound.mp3' naar 'music.mp3' voor het muziekbestand
+            audio.loop = true; // Loop de muziek zodat het altijd afspeelt
+            audio.play().catch(function(error) {
+                console.error('Failed to play music:', error);
+            });
         }
     </script>
 </head>
