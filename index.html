@@ -71,10 +71,12 @@
     </style>
 </head>
 <body>
-    <!-- Begroeting met horror en getypt effect -->
-    <div id="horrorText"></div>
+    <!-- Welkomsttekst -->
+    <div id="welcomeText">
+        <h1>Welcome Mr/Dr</h1>
+    </div>
 
-    <!-- Verberg de container totdat de begroeting is voltooid -->
+    <!-- Container voor inhoud -->
     <div id="container" class="container">
         <img src="horror_image.jpg" alt="Horror Image" class="horror-img">
         <h1>Welcome to the Horror Site</h1>
@@ -175,20 +177,12 @@
         // Roep de functie op wanneer de pagina wordt geladen
         window.onload = function() {
             // Horror begroeting met getypt effect
-            var horrorText = document.getElementById('horrorText');
+            var welcomeText = document.getElementById('welcomeText');
             var username = localStorage.getItem('username');
             if (username) {
-                var message = 'Welcome ' + username + '...';
-                simulateTyping(horrorText, message, 50, function() {
-                    setTimeout(function() {
-                        document.getElementById('container').style.display = 'block';
-                    }, 1500);
-                });
-            } else {
-                horrorText.textContent = "Enter if you dare...";
-                document.getElementById('container').style.display = 'block';
+                welcomeText.innerHTML = "<h1>Welcome Mr/Dr " + username + "</h1>";
             }
-
+            
             // Voeg een click event toe aan de "Enter if you dare" knop
             document.getElementById('enterBtn').addEventListener('click', function() {
                 var usernameInput = document.getElementById('username').value;
