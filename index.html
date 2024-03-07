@@ -20,13 +20,11 @@
             text-align: center;
         }
         h1 {
-            font-size: 3em;
+            font-size: 5em;
             margin-bottom: 20px;
-        }
-        p {
-            font-size: 1.2em;
-            line-height: 1.6;
-            margin-bottom: 30px;
+            font-weight: bold;
+            font-style: italic;
+            text-shadow: 3px 3px 5px #000;
         }
         .container {
             display: none; /* Verberg container standaard */
@@ -70,7 +68,7 @@
 <body>
     <!-- Welkomsttekst -->
     <div id="welcomeText" style="display: none;">
-        <h1>Welcome to the Horror Site</h1>
+        <h1>WELCOME</h1>
     </div>
 
     <!-- Container voor inhoud -->
@@ -113,6 +111,7 @@
             // Verberg welkomsttekst na 2.5 seconden
             setTimeout(function() {
                 document.getElementById('welcomeText').style.display = 'none';
+                document.getElementById('container').style.display = 'block';
             }, 2500);
 
             // Voeg een click event toe aan de "Enter if you dare" knop
