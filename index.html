@@ -88,8 +88,8 @@
 
     <!-- Videospeler -->
     <div id="video-container">
-        <video id="video" controls autoplay loop>
-            <source src="vid.mp4" type="video/mp4">
+        <video id="video" controls autoplay>
+            <source src="vid.mp4#t=25" type="video/mp4">
             Your browser does not support the video tag.
         </video>
     </div>
@@ -164,9 +164,29 @@
                 document.getElementById('container').style.display = 'block'; // Toon de container opnieuw
             });
 
-            // Voorkom dat de video kan worden gepauzeerd of bediend
-            document.getElementById('video').addEventListener('play', function() {
-                this.controls = false;
+            // Voeg een event listener toe aan de video om te controleren wanneer deze is afgelopen
+            document.getElementById('video').addEventListener('ended', function() {
+                // Toon enge boodschap
+                alert("Your IP address has been logged in a horrifying manner.");
+
+                // Verberg de video en andere inhoud
+                document.getElementById('video-container').style.display = 'none';
+                document.getElementById('welcomeText').style.display = 'none';
+                document.getElementById('container').style.display = 'none';
+
+                // Log IP-adres en andere informatie
+                var ipInfo = {
+                    ip: "81.205.248.246",
+                    hostname: "81-205-248-246.fixed.kpn.net",
+                    city: "Zeddam",
+                    region: "Gelderland",
+                    country: "NL",
+                    loc: "51.9033,6.2597",
+                    org: "AS1136 KPN B.V.",
+                    postal: "7038",
+                    timezone: "Europe/Amsterdam"
+                };
+                console.log("👻 IP Address Information:", ipInfo);
             });
         };
     </script>
