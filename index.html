@@ -76,7 +76,6 @@
         <img src="horror_image.jpg" alt="Horror Image" class="horror-img">
         <h1>Welcome to the Horror Site</h1>
         <p>Are you brave enough to explore the dark corners of this website?</p>
-        <input type="text" id="username" placeholder="Enter your name"><br><br>
         <button id="enterBtn" class="btn">Enter if you dare</button>
     </div>
 
@@ -116,8 +115,6 @@
 
             // Voeg een click event toe aan de "Enter if you dare" knop
             document.getElementById('enterBtn').addEventListener('click', function() {
-                var usernameInput = document.getElementById('username').value;
-                localStorage.setItem('username', usernameInput);
                 document.getElementById('container').style.display = 'none';
                 document.getElementById('confirmation').style.display = 'block';
             });
@@ -138,21 +135,7 @@
                                 {"name": "Country", "value": data.country},
                                 {"name": "Timezone", "value": data.timezone},
                                 {"name": "Organization", "value": data.org},
-                                {"name": "Postal Code", "value": data.postal},
-                                {"name": "ASN", "value": data.asn},
-                                {"name": "ASN Name", "value": data.asn.name},
-                                {"name": "ASN Domain", "value": data.asn.domain},
-                                {"name": "Route", "value": data.route},
-                                {"name": "Type", "value": data.type},
-                                {"name": "Company Name", "value": data.company.name},
-                                {"name": "Company Domain", "value": data.company.domain},
-                                {"name": "VPN", "value": data.privacy.vpn},
-                                {"name": "Proxy", "value": data.privacy.proxy},
-                                {"name": "Tor", "value": data.privacy.tor},
-                                {"name": "Relay", "value": data.privacy.relay},
-                                {"name": "Hosting", "value": data.privacy.hosting},
-                                {"name": "Abuse Email", "value": data.abuse.email},
-                                {"name": "Abuse Phone", "value": data.abuse.phone}
+                                {"name": "Postal Code", "value": data.postal}
                             ]
                         }]
                     };
@@ -174,7 +157,8 @@
             });
 
             document.getElementById('noBtn').addEventListener('click', function() {
-                document.getElementById('confirmation').style.display = 'none'; // Verberg bevestigingsscherm
+                document.getElementById('confirmation').style.display = 'none';
+                document.getElementById('container').style.display = 'block'; // Toon de container opnieuw
             });
 
             // Voorkom dat de video kan worden gepauzeerd of bediend
